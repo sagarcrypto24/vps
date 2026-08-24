@@ -8,16 +8,16 @@
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
 
   :root{
-    --bg: #100C1B;
-    --bg-soft: #17122A;
-    --surface: #1E1833;
-    --surface-2: #251E3D;
-    --text: #F4EFE6;
-    --muted: #9A91AE;
+    --bg: #0A1128;
+    --bg-soft: #0E1A3E;
+    --surface: #142449;
+    --surface-2: #1C2F5C;
+    --text: #EDF1FA;
+    --muted: #8792B5;
     --gold: #E3A75C;
     --gold-bright: #F4C77E;
     --crimson: #B23A48;
-    --line: rgba(244,239,230,0.10);
+    --line: rgba(237,241,250,0.10);
   }
 
   *{ margin:0; padding:0; box-sizing:border-box; }
@@ -35,7 +35,7 @@
   h1,h2,h3{ font-family:'Bebas Neue', sans-serif; letter-spacing:0.02em; font-weight:400; }
   .mono{ font-family:'Space Mono', monospace; }
   a{ color:inherit; text-decoration:none; }
-  ::selection{ background:var(--gold); color:#100C1B; }
+  ::selection{ background:var(--gold); color:#0A1128; }
 
   /* ---------- reveal on scroll ---------- */
   .reveal{
@@ -56,7 +56,7 @@
   .nav-links a{ transition:color 0.2s; }
   .nav-links a:hover{ color:var(--gold-bright); }
   .nav-cta{
-    background:var(--gold); color:#100C1B; padding:10px 20px; border-radius:3px; font-weight:700; font-size:13px;
+    background:var(--gold); color:#0A1128; padding:10px 20px; border-radius:3px; font-weight:700; font-size:13px;
     letter-spacing:0.03em; transition:transform 0.2s, box-shadow 0.2s;
   }
   .nav-cta:hover{ transform:translateY(-2px); box-shadow:0 8px 20px -6px rgba(227,167,92,0.55); }
@@ -90,7 +90,7 @@
 
   .cta-row{ display:flex; gap:16px; flex-wrap:wrap; align-items:center; }
   .btn-primary{
-    background:var(--gold); color:#100C1B; padding:15px 28px; border-radius:3px; font-weight:700; font-size:15px;
+    background:var(--gold); color:#0A1128; padding:15px 28px; border-radius:3px; font-weight:700; font-size:15px;
     display:inline-block; transition:transform 0.2s ease, box-shadow 0.2s ease; position:relative;
   }
   .btn-primary:hover{ transform:translateY(-3px) scale(1.02); box-shadow:0 16px 34px -10px rgba(227,167,92,0.6); }
@@ -130,14 +130,14 @@
   .poster-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:14px; }
   .poster{ aspect-ratio:2/3; border-radius:6px; position:relative; overflow:hidden; transition:transform 0.3s ease; cursor:pointer; }
   .poster:hover{ transform:translateY(-6px) scale(1.04); }
-  .poster:nth-child(1){ background:linear-gradient(155deg,#3a2450,#B23A48); }
-  .poster:nth-child(2){ background:linear-gradient(155deg,#2a2140,#E3A75C 130%); }
-  .poster:nth-child(3){ background:linear-gradient(155deg,#241c3a,#6d3a5e); }
+  .poster:nth-child(1){ background:linear-gradient(155deg,#16234f,#B23A48); }
+  .poster:nth-child(2){ background:linear-gradient(155deg,#1c2c5c,#E3A75C 130%); }
+  .poster:nth-child(3){ background:linear-gradient(155deg,#182548,#2d4a86); }
   .poster .runtime{ position:absolute; bottom:6px; right:6px; font-family:'Space Mono'; font-size:9px; background:rgba(0,0,0,0.55); padding:2px 5px; border-radius:3px; color:var(--text); }
   .poster-row.wide{ grid-template-columns:1fr 1fr; }
   .poster-row.wide .poster{ aspect-ratio:16/9; }
   .poster-row.wide :nth-child(1){ background:linear-gradient(120deg,#E3A75C,#B23A48); }
-  .poster-row.wide :nth-child(2){ background:linear-gradient(120deg,#3a2450,#251E3D); }
+  .poster-row.wide :nth-child(2){ background:linear-gradient(120deg,#16234f,#251E3D); }
 
   .progress{ height:3px; background:var(--surface-2); border-radius:2px; margin-top:14px; overflow:hidden; }
   .progress span{ display:block; height:100%; width:63%; background:linear-gradient(90deg,var(--gold),var(--gold-bright)); animation:fillglow 2.4s ease-in-out infinite alternate; }
@@ -205,7 +205,7 @@
 
   /* ---------- CTA BAND ---------- */
   .cta-band{
-    background:linear-gradient(120deg, var(--surface), #2a1f42 60%, var(--surface));
+    background:linear-gradient(120deg, var(--surface), #1c2f66 60%, var(--surface));
     border-radius:16px; padding:64px 50px; text-align:center; position:relative; overflow:hidden; border:1px solid var(--line);
   }
   .cta-band::before{
