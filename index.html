@@ -12,8 +12,8 @@
     --bg-soft: #141414;
     --surface: #181818;
     --surface-2: #222222;
-    --text: #F5F5F1;
-    --muted: #B3B3B3;
+    --text: #FFFFFF;
+    --muted: #CFCFCF;
     --red: #E50914;
     --red-bright: #F6121D;
     --red-deep: #6E0A0F;
@@ -24,7 +24,7 @@
   html{ scroll-behavior:smooth; }
   body{
     background:var(--bg); color:var(--text); font-family:'Inter', sans-serif;
-    line-height:1.6; overflow-x:hidden;
+    line-height:1.65; overflow-x:hidden; font-weight:500;
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -51,7 +51,7 @@
   .nav-inner{ max-width:1180px; margin:0 auto; padding:16px 24px; display:flex; align-items:center; justify-content:space-between; }
   .logo{ font-family:'Bebas Neue'; font-size:24px; letter-spacing:0.06em; display:flex; align-items:center; gap:8px; color:var(--red); }
   .logo span.wordmark{ color:var(--text); }
-  .nav-links{ display:flex; gap:30px; font-size:14px; color:var(--muted); }
+  .nav-links{ display:flex; gap:30px; font-size:14px; color:var(--muted); font-weight:600; }
   .nav-links a{ transition:color 0.2s; }
   .nav-links a:hover{ color:var(--red-bright); }
   .nav-cta{
@@ -94,7 +94,7 @@
   .hero h1{ font-size:clamp(38px, 7vw, 68px); line-height:1.0; margin-bottom:20px; text-shadow:0 10px 40px rgba(0,0,0,0.6); }
   .hero h1 span{ color:var(--red); }
 
-  .hero p.lede{ font-size:clamp(15px,2vw,18px); color:var(--muted); max-width:480px; margin-bottom:30px; }
+  .hero p.lede{ font-size:clamp(15px,2vw,18px); color:var(--muted); max-width:480px; margin-bottom:30px; font-weight:600; }
 
   .cta-row{ display:flex; gap:14px; flex-wrap:wrap; align-items:center; }
   .btn-primary{
@@ -154,9 +154,14 @@
   /* ---------- SECTION SHELL ---------- */
   section{ padding:70px 0; }
   .section-head{ max-width:640px; margin-bottom:32px; }
-  .kicker{ font-family:'Space Mono'; font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--red); display:block; margin-bottom:12px; }
+  .kicker{
+    font-family:'Space Mono'; font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--red);
+    display:inline-flex; align-items:center; gap:8px; margin-bottom:12px; font-weight:700;
+  }
+  .kicker::before{ content:''; width:18px; height:2px; background:var(--red); display:inline-block; animation:kicker-pulse 1.8s ease-in-out infinite; }
+  @keyframes kicker-pulse{ 0%,100%{ opacity:1; width:18px; } 50%{ opacity:0.4; width:30px; } }
   .section-head h2{ font-size:clamp(26px,3.6vw,40px); line-height:1.05; }
-  .section-head p{ color:var(--muted); margin-top:12px; font-size:14.5px; max-width:560px; }
+  .section-head p{ color:var(--muted); margin-top:12px; font-size:14.5px; max-width:560px; font-weight:600; }
 
   @media (max-width:600px){ section{ padding:44px 0; } .section-head{ margin-bottom:24px; } }
 
@@ -187,7 +192,7 @@
     font-size:20px; font-family:'Bebas Neue'; font-weight:400; letter-spacing:0.02em; margin-bottom:6px;
     transform:translateZ(16px); line-height:1.1; color:var(--text);
   }
-  .info-box p{ color:var(--muted); font-size:12.5px; transform:translateZ(16px); line-height:1.45; margin-bottom:14px; }
+  .info-box p{ color:var(--muted); font-size:12.5px; font-weight:600; transform:translateZ(16px); line-height:1.5; margin-bottom:14px; }
 
   /* animated scrolling ticker strip at the bottom of each box */
   .b-ticker{
@@ -203,33 +208,12 @@
   }
   @keyframes ticker-scroll{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
 
-  /* ---------- BENEFIT BOXES: higher contrast, tinted, icon-led ---------- */
-  .benefit-box{
-    background:linear-gradient(160deg, color-mix(in srgb, var(--accent, var(--red)) 14%, var(--surface)), var(--surface) 65%);
-    border-left:none; border:1px solid color-mix(in srgb, var(--accent, var(--red)) 35%, var(--line));
+  /* ---------- BENEFIT BOXES: plain, non-animated, black/white ---------- */
+  .simple-box{
+    background:#000; border:1px solid rgba(255,255,255,0.22); border-radius:8px; padding:22px 20px;
   }
-  .benefit-box .b-icon{
-    width:38px; height:38px; border-radius:8px; display:flex; align-items:center; justify-content:center;
-    font-size:18px; margin-bottom:10px; transform:translateZ(16px);
-    background:color-mix(in srgb, var(--accent, var(--red)) 28%, transparent);
-    border:1px solid color-mix(in srgb, var(--accent, var(--red)) 45%, transparent);
-  }
-  .benefit-box h3{ color:var(--accent, var(--red-bright)); font-size:22px; }
-  .benefit-box p{ color:#E8E6E2; font-size:13px; }
-  .benefit-box:hover{ box-shadow:0 20px 40px -18px rgba(0,0,0,0.7), 0 0 0 1px color-mix(in srgb, var(--accent, var(--red)) 50%, transparent); }
-
-  /* ---------- PROCESS ---------- */
-  .process{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; perspective:1200px; }
-  @media (max-width:860px){ .process{ grid-template-columns:1fr 1fr; } }
-  @media (max-width:480px){ .process{ grid-template-columns:1fr; } }
-  .step{
-    border:1px solid var(--line); border-radius:10px; padding:22px 20px; background:var(--surface);
-    position:relative; transition:transform 0.4s cubic-bezier(.2,.9,.3,1.3), border-color 0.3s;
-  }
-  .step:hover{ transform:translateY(-8px) rotateX(3deg); border-color:rgba(229,9,20,0.4); }
-  .step .step-num{ font-family:'Space Mono'; color:var(--red); font-size:11.5px; margin-bottom:16px; display:block; }
-  .step h3{ font-size:19px; font-family:'Inter'; font-weight:700; margin-bottom:8px; }
-  .step p{ color:var(--muted); font-size:13px; line-height:1.55; }
+  .simple-box h3{ color:#FFFFFF; font-family:'Inter'; font-weight:800; font-size:19px; margin-bottom:9px; letter-spacing:0.01em; }
+  .simple-box p{ color:#FFFFFF; opacity:0.82; font-weight:500; font-size:13.5px; line-height:1.6; }
 
   /* ---------- CTA BAND ---------- */
   .cta-band{
@@ -263,7 +247,6 @@
       <a href="#preview">प्रीव्यू</a>
       <a href="#build">क्या बनाते हैं</a>
       <a href="#benefits">फायदे</a>
-      <a href="#process">प्रोसेस</a>
     </div>
     <a href="#contact" class="nav-cta">प्रोजेक्ट शुरू करें</a>
   </div>
@@ -392,59 +375,30 @@
     </div>
 
     <div class="box-grid">
-      <div class="info-box benefit-box tilt-box reveal" style="--accent:#E50914">
-        <div class="b-icon">💰</div>
+      <div class="simple-box reveal">
         <h3>सीधी कमाई</h3>
-        <p>पेमेंट सीधे आपके अकाउंट में — किसी का कमीशन नहीं कटता।</p>
-        <div class="b-ticker"><span class="b-ticker-track"><span>💰 0% कमीशन</span><span>🏦 डायरेक्ट पेआउट</span><span>💰 0% कमीशन</span><span>🏦 डायरेक्ट पेआउट</span></span></div>
+        <p>सब्सक्रिप्शन और पेमेंट सीधे आपके अकाउंट में आते हैं — किसी और प्लेटफॉर्म का कमीशन नहीं कटता।</p>
       </div>
-      <div class="info-box benefit-box tilt-box reveal" style="--accent:#F5A623">
-        <div class="b-icon">🔒</div>
+      <div class="simple-box reveal">
         <h3>डेटा आपका</h3>
-        <p>कौन क्या देखता है — ये डेटा पूरी तरह आपकी प्रॉपर्टी है।</p>
-        <div class="b-ticker"><span class="b-ticker-track"><span>🔒 100% ओनरशिप</span><span>📊 फुल इनसाइट्स</span><span>🔒 100% ओनरशिप</span><span>📊 फुल इनसाइट्स</span></span></div>
+        <p>कौन क्या देखता है, कितनी देर देखता है — ये पूरा डेटा आपकी प्रॉपर्टी है, किसी और की नहीं।</p>
       </div>
-      <div class="info-box benefit-box tilt-box reveal" style="--accent:#8B5CF6">
-        <div class="b-icon">🎨</div>
+      <div class="simple-box reveal">
         <h3>ब्रांड आपका</h3>
-        <p>नाम, लोगो, रंग — हर चीज़ आपकी पहचान से मेल खाती है।</p>
-        <div class="b-ticker"><span class="b-ticker-track"><span>🎨 फुल कस्टम</span><span>🏷️ यूनीक आइडेंटिटी</span><span>🎨 फुल कस्टम</span><span>🏷️ यूनीक आइडेंटिटी</span></span></div>
+        <p>नाम, लोगो, रंग — हर चीज़ आपकी पहचान से मेल खाती है, पूरी तरह आपके कंट्रोल में।</p>
       </div>
-      <div class="info-box benefit-box tilt-box reveal" style="--accent:#2E9BF0">
-        <div class="b-icon">🔔</div>
+      <div class="simple-box reveal">
         <h3>डायरेक्ट पहुंच</h3>
-        <p>एल्गोरिद्म पर निर्भर नहीं — नोटिफिकेशन से सीधे ऑडियंस तक।</p>
-        <div class="b-ticker"><span class="b-ticker-track"><span>🔔 पुश नोटिफिकेशन</span><span>⏰ 24/7 कनेक्ट</span><span>🔔 पुश नोटिफिकेशन</span><span>⏰ 24/7 कनेक्ट</span></span></div>
+        <p>एल्गोरिद्म पर निर्भर नहीं रहना पड़ता — नोटिफिकेशन से सीधे अपनी ऑडियंस तक पहुंचें।</p>
       </div>
-      <div class="info-box benefit-box tilt-box reveal" style="--accent:#2ECC71">
-        <div class="b-icon">⬇️</div>
+      <div class="simple-box reveal">
         <h3>ऑफलाइन देखें</h3>
-        <p>डाउनलोड करके बिना इंटरनेट भी — कम स्पीड इलाकों में भी जुड़ाव बना रहे।</p>
-        <div class="b-ticker"><span class="b-ticker-track"><span>⬇️ डाउनलोड करें</span><span>📶 नो इंटरनेट ज़रूरी नहीं</span><span>⬇️ डाउनलोड करें</span><span>📶 नो इंटरनेट ज़रूरी नहीं</span></span></div>
+        <p>दर्शक एपिसोड डाउनलोड करके बिना इंटरनेट के भी देख सकते हैं, कम स्पीड इलाकों में भी।</p>
       </div>
-      <div class="info-box benefit-box tilt-box reveal" style="--accent:#FF3D71">
-        <div class="b-icon">📈</div>
+      <div class="simple-box reveal">
         <h3>ऑटो-स्केल</h3>
-        <p>100 यूज़र हों या 1 लाख — इंफ्रास्ट्रक्चर खुद स्केल होता है।</p>
-        <div class="b-ticker"><span class="b-ticker-track"><span>📈 अनलिमिटेड ग्रोथ</span><span>⚙️ ज़ीरो चिंता</span><span>📈 अनलिमिटेड ग्रोथ</span><span>⚙️ ज़ीरो चिंता</span></span></div>
+        <p>100 यूज़र हों या 1 लाख — इंफ्रास्ट्रक्चर अपने आप स्केल होता है, बिना किसी चिंता के।</p>
       </div>
-    </div>
-  </div>
-</section>
-
-<section id="process">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <span class="kicker">प्रोसेस</span>
-      <h2>आइडिया से लॉन्च तक</h2>
-      <p>चार साफ स्टेप्स, हर एक के आखिर में आप देखते और अप्रूव करते हैं।</p>
-    </div>
-
-    <div class="process">
-      <div class="step reveal"><span class="step-num mono">STEP 01</span><h3>डिस्कवरी कॉल</h3><p>आपका कंटेंट, ऑडियंस और बिज़नेस मॉडल समझते हैं — फीचर लिस्ट फाइनल होती है।</p></div>
-      <div class="step reveal"><span class="step-num mono">STEP 02</span><h3>डिज़ाइन</h3><p>आपके ब्रांड के हिसाब से ऐप का लुक और फील तैयार होता है, आपकी मंज़ूरी के साथ।</p></div>
-      <div class="step reveal"><span class="step-num mono">STEP 03</span><h3>डेवलपमेंट</h3><p>वीडियो इंफ्रास्ट्रक्चर, पेमेंट, ऐप्स — सब बनते हैं, हर हफ्ते अपडेट मिलता है।</p></div>
-      <div class="step reveal"><span class="step-num mono">STEP 04</span><h3>लॉन्च</h3><p>ऐप स्टोर, प्ले स्टोर और वेब पर लाइव — साथ में लॉन्च के बाद सपोर्ट।</p></div>
     </div>
   </div>
 </section>
@@ -466,7 +420,6 @@
       <a href="#preview">प्रीव्यू</a>
       <a href="#build">क्या बनाते हैं</a>
       <a href="#benefits">फायदे</a>
-      <a href="#process">प्रोसेस</a>
       <a href="#contact">संपर्क करें</a>
     </div>
     <div class="copyright">© 2026 STREAMFORGE STUDIO</div>
