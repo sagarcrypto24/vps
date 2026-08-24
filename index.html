@@ -21,15 +21,10 @@
   }
 
   *{ margin:0; padding:0; box-sizing:border-box; }
-
   html{ scroll-behavior:smooth; }
-
   body{
-    background:var(--bg);
-    color:var(--text);
-    font-family:'Inter', sans-serif;
-    line-height:1.6;
-    overflow-x:hidden;
+    background:var(--bg); color:var(--text); font-family:'Inter', sans-serif;
+    line-height:1.6; overflow-x:hidden;
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -37,166 +32,158 @@
   }
 
   .wrap{ max-width:1180px; margin:0 auto; padding:0 32px; }
-
   h1,h2,h3{ font-family:'Bebas Neue', sans-serif; letter-spacing:0.02em; font-weight:400; }
-
   .mono{ font-family:'Space Mono', monospace; }
-
   a{ color:inherit; text-decoration:none; }
-
   ::selection{ background:var(--gold); color:#100C1B; }
+
+  /* ---------- reveal on scroll ---------- */
+  .reveal{
+    opacity:0; transform:translateY(36px) rotateX(6deg); transform-origin:top center;
+    transition:opacity 0.9s cubic-bezier(.16,.84,.44,1), transform 0.9s cubic-bezier(.16,.84,.44,1);
+  }
+  .reveal.in{ opacity:1; transform:translateY(0) rotateX(0deg); }
 
   /* ---------- NAV ---------- */
   nav{
-    position:fixed; top:0; left:0; right:0; z-index:100;
-    background:rgba(16,12,27,0.85);
-    backdrop-filter:blur(10px);
-    border-bottom:1px solid var(--line);
+    position:fixed; top:0; left:0; right:0; z-index:200;
+    background:rgba(16,12,27,0.85); backdrop-filter:blur(10px); border-bottom:1px solid var(--line);
   }
-  .nav-inner{
-    max-width:1180px; margin:0 auto; padding:18px 32px;
-    display:flex; align-items:center; justify-content:space-between;
-  }
+  .nav-inner{ max-width:1180px; margin:0 auto; padding:18px 32px; display:flex; align-items:center; justify-content:space-between; }
   .logo{ font-family:'Bebas Neue'; font-size:26px; letter-spacing:0.06em; display:flex; align-items:center; gap:8px; }
-  .logo .dot{ width:9px; height:9px; border-radius:50%; background:var(--crimson); box-shadow:0 0 10px var(--crimson); }
+  .logo .dot{ width:9px; height:9px; border-radius:50%; background:var(--crimson); box-shadow:0 0 10px var(--crimson); animation:pulse 1.6s infinite; }
   .nav-links{ display:flex; gap:36px; font-size:14px; color:var(--muted); }
+  .nav-links a{ transition:color 0.2s; }
   .nav-links a:hover{ color:var(--gold-bright); }
   .nav-cta{
-    background:var(--gold); color:#100C1B; padding:10px 20px; border-radius:3px;
-    font-weight:700; font-size:13px; letter-spacing:0.03em;
+    background:var(--gold); color:#100C1B; padding:10px 20px; border-radius:3px; font-weight:700; font-size:13px;
+    letter-spacing:0.03em; transition:transform 0.2s, box-shadow 0.2s;
   }
+  .nav-cta:hover{ transform:translateY(-2px); box-shadow:0 8px 20px -6px rgba(227,167,92,0.55); }
   @media (max-width:820px){ .nav-links{ display:none; } }
 
   /* ---------- HERO ---------- */
-  .hero{
-    padding:170px 0 100px;
-    position:relative;
-  }
-  .hero-grid{
-    display:grid; grid-template-columns:1.05fr 0.95fr; gap:70px; align-items:center;
-  }
+  .hero{ padding:170px 0 100px; position:relative; }
+  #hero-canvas{ position:absolute; inset:0; width:100%; height:100%; z-index:0; pointer-events:none; opacity:0.9; }
+  .hero-grid{ display:grid; grid-template-columns:1.05fr 0.95fr; gap:70px; align-items:center; position:relative; z-index:1; perspective:1400px; }
   @media (max-width:960px){ .hero-grid{ grid-template-columns:1fr; gap:60px; } }
 
   .eyebrow{
-    display:inline-flex; align-items:center; gap:10px;
-    font-family:'Space Mono'; font-size:12px; letter-spacing:0.12em; text-transform:uppercase;
-    color:var(--gold-bright); border:1px solid rgba(227,167,92,0.35); padding:7px 14px; border-radius:999px;
-    margin-bottom:26px;
+    display:inline-flex; align-items:center; gap:10px; font-family:'Space Mono'; font-size:12px;
+    letter-spacing:0.12em; text-transform:uppercase; color:var(--gold-bright);
+    border:1px solid rgba(227,167,92,0.35); padding:7px 14px; border-radius:999px; margin-bottom:26px;
   }
   .eyebrow .rec{ width:7px; height:7px; border-radius:50%; background:var(--crimson); animation:pulse 1.6s infinite; }
   @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:0.25;} }
 
-  .hero h1{
-    font-size:clamp(42px, 6vw, 74px);
-    line-height:0.98;
-    margin-bottom:26px;
+  .hero h1{ font-size:clamp(42px, 6vw, 74px); line-height:0.98; margin-bottom:26px; text-shadow:0 8px 40px rgba(227,167,92,0.15); }
+  .hero h1 span{
+    color:var(--gold);
+    background:linear-gradient(90deg, var(--gold-bright), var(--gold), var(--crimson), var(--gold));
+    background-size:300% auto;
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    animation:shine 6s linear infinite;
   }
-  .hero h1 span{ color:var(--gold); }
+  @keyframes shine{ to{ background-position:300% center; } }
 
-  .hero p.lede{
-    font-size:18px; color:var(--muted); max-width:480px; margin-bottom:38px;
-  }
+  .hero p.lede{ font-size:18px; color:var(--muted); max-width:480px; margin-bottom:38px; }
 
   .cta-row{ display:flex; gap:16px; flex-wrap:wrap; align-items:center; }
   .btn-primary{
-    background:var(--gold); color:#100C1B; padding:15px 28px; border-radius:3px;
-    font-weight:700; font-size:15px; display:inline-block;
-    transition:transform 0.15s ease, box-shadow 0.15s ease;
+    background:var(--gold); color:#100C1B; padding:15px 28px; border-radius:3px; font-weight:700; font-size:15px;
+    display:inline-block; transition:transform 0.2s ease, box-shadow 0.2s ease; position:relative;
   }
-  .btn-primary:hover{ transform:translateY(-2px); box-shadow:0 10px 30px -8px rgba(227,167,92,0.5); }
+  .btn-primary:hover{ transform:translateY(-3px) scale(1.02); box-shadow:0 16px 34px -10px rgba(227,167,92,0.6); }
+  .btn-primary:active{ transform:translateY(-1px) scale(0.99); }
   .btn-primary:focus-visible{ outline:3px solid var(--gold-bright); outline-offset:3px; }
-  .btn-ghost{
-    color:var(--text); padding:15px 8px; font-weight:600; font-size:15px; border-bottom:1px solid var(--line);
-  }
+  .btn-ghost{ color:var(--text); padding:15px 8px; font-weight:600; font-size:15px; border-bottom:1px solid var(--line); transition:border-color 0.2s; }
   .btn-ghost:hover{ border-color:var(--gold); }
 
   .trust-strip{ margin-top:56px; display:flex; gap:34px; flex-wrap:wrap; }
-  .trust-item{ }
   .trust-item .num{ font-family:'Bebas Neue'; font-size:34px; color:var(--gold-bright); }
   .trust-item .lbl{ font-size:12px; color:var(--muted); font-family:'Space Mono'; letter-spacing:0.05em; }
 
-  /* ---------- DEVICE MOCKUP / SIGNATURE ---------- */
+  /* ---------- 3D DEVICE MOCKUP ---------- */
+  .stage-holder{ perspective:1600px; }
   .stage{
-    position:relative;
-    padding:22px;
-    border-radius:18px;
+    position:relative; padding:22px; border-radius:18px;
     background:linear-gradient(180deg, var(--surface), var(--bg-soft));
-    isolation:isolate;
+    isolation:isolate; transform-style:preserve-3d;
+    transition:transform 0.15s ease-out;
+    box-shadow:0 40px 80px -30px rgba(0,0,0,0.6);
   }
   .stage::before{
-    content:'';
-    position:absolute; inset:0; border-radius:18px; padding:2px;
+    content:''; position:absolute; inset:0; border-radius:18px; padding:2px;
     background:conic-gradient(from var(--ang,0deg), transparent 0 78%, var(--gold-bright) 84%, var(--crimson) 90%, transparent 96%);
     -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite:xor; mask-composite:exclude;
-    animation:chase 4.5s linear infinite;
-    z-index:-1;
+    animation:chase 4.5s linear infinite; z-index:-1;
   }
   @keyframes chase{ to{ --ang:360deg; } }
   @property --ang{ syntax:'<angle>'; inherits:false; initial-value:0deg; }
 
-  .screen{
-    background:#0B0815; border-radius:12px; padding:18px; border:1px solid var(--line);
-  }
+  .screen{ background:#0B0815; border-radius:12px; padding:18px; border:1px solid var(--line); transform:translateZ(30px); }
   .screen-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
   .app-name{ font-family:'Bebas Neue'; font-size:20px; letter-spacing:0.05em; }
   .screen-tag{ font-family:'Space Mono'; font-size:10px; color:var(--muted); background:var(--surface-2); padding:4px 9px; border-radius:4px; }
 
   .poster-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:14px; }
-  .poster{
-    aspect-ratio:2/3; border-radius:6px; position:relative; overflow:hidden;
-  }
+  .poster{ aspect-ratio:2/3; border-radius:6px; position:relative; overflow:hidden; transition:transform 0.3s ease; cursor:pointer; }
+  .poster:hover{ transform:translateY(-6px) scale(1.04); }
   .poster:nth-child(1){ background:linear-gradient(155deg,#3a2450,#B23A48); }
   .poster:nth-child(2){ background:linear-gradient(155deg,#2a2140,#E3A75C 130%); }
   .poster:nth-child(3){ background:linear-gradient(155deg,#241c3a,#6d3a5e); }
-  .poster .runtime{
-    position:absolute; bottom:6px; right:6px; font-family:'Space Mono'; font-size:9px;
-    background:rgba(0,0,0,0.55); padding:2px 5px; border-radius:3px; color:var(--text);
-  }
+  .poster .runtime{ position:absolute; bottom:6px; right:6px; font-family:'Space Mono'; font-size:9px; background:rgba(0,0,0,0.55); padding:2px 5px; border-radius:3px; color:var(--text); }
   .poster-row.wide{ grid-template-columns:1fr 1fr; }
   .poster-row.wide .poster{ aspect-ratio:16/9; }
   .poster-row.wide :nth-child(1){ background:linear-gradient(120deg,#E3A75C,#B23A48); }
   .poster-row.wide :nth-child(2){ background:linear-gradient(120deg,#3a2450,#251E3D); }
 
   .progress{ height:3px; background:var(--surface-2); border-radius:2px; margin-top:14px; overflow:hidden; }
-  .progress span{ display:block; height:100%; width:63%; background:var(--gold); }
+  .progress span{ display:block; height:100%; width:63%; background:linear-gradient(90deg,var(--gold),var(--gold-bright)); animation:fillglow 2.4s ease-in-out infinite alternate; }
+  @keyframes fillglow{ from{ filter:brightness(1);} to{ filter:brightness(1.4);} }
 
-  .now-screening{
-    display:flex; align-items:center; gap:8px; margin-top:16px; padding-top:14px; border-top:1px solid var(--line);
-    font-family:'Space Mono'; font-size:11px; color:var(--muted); overflow:hidden; white-space:nowrap;
-  }
+  .now-screening{ display:flex; align-items:center; gap:8px; margin-top:16px; padding-top:14px; border-top:1px solid var(--line); font-family:'Space Mono'; font-size:11px; color:var(--muted); overflow:hidden; white-space:nowrap; }
   .now-screening b{ color:var(--gold-bright); }
 
   /* ---------- SECTION SHELL ---------- */
   section{ padding:110px 0; }
   .section-head{ max-width:640px; margin-bottom:64px; }
-  .kicker{
-    font-family:'Space Mono'; font-size:12px; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold);
-    display:block; margin-bottom:14px;
-  }
+  .kicker{ font-family:'Space Mono'; font-size:12px; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); display:block; margin-bottom:14px; }
   .section-head h2{ font-size:clamp(32px,4.2vw,48px); line-height:1.05; }
   .section-head p{ color:var(--muted); margin-top:16px; font-size:16px; max-width:560px; }
 
-  hr.rule{ border:none; border-top:1px solid var(--line); }
-
-  /* ---------- WHAT WE BUILD ---------- */
-  .build-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+  /* ---------- WHAT WE BUILD — 3D TILT CARDS ---------- */
+  .build-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
   @media (max-width:860px){ .build-grid{ grid-template-columns:1fr; } }
-  .build-card{ background:var(--bg); padding:34px 30px; }
-  .build-card .icon{ width:38px; height:38px; margin-bottom:20px; color:var(--gold-bright); }
-  .build-card h3{ font-size:22px; margin-bottom:10px; font-family:'Inter'; font-weight:700; }
-  .build-card p{ color:var(--muted); font-size:14.5px; }
+  .build-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:34px 30px;
+    transform-style:preserve-3d; transition:transform 0.12s ease-out, box-shadow 0.3s ease, border-color 0.3s ease;
+    position:relative; overflow:hidden;
+  }
+  .build-card::after{
+    content:''; position:absolute; inset:0; opacity:0; border-radius:12px;
+    background:radial-gradient(280px circle at var(--mx,50%) var(--my,50%), rgba(227,167,92,0.14), transparent 60%);
+    transition:opacity 0.3s ease; pointer-events:none;
+  }
+  .build-card:hover{ border-color:rgba(227,167,92,0.4); box-shadow:0 24px 50px -20px rgba(0,0,0,0.5); }
+  .build-card:hover::after{ opacity:1; }
+  .build-card h3{ font-size:22px; margin-bottom:10px; font-family:'Inter'; font-weight:700; transform:translateZ(20px); }
+  .build-card p{ color:var(--muted); font-size:14.5px; transform:translateZ(20px); }
+  .card-num{ font-family:'Space Mono'; font-size:12px; color:var(--crimson); margin-bottom:18px; display:block; transform:translateZ(20px); }
 
   /* ---------- BENEFITS ---------- */
   .benefits{ background:var(--bg-soft); }
   .benefit-list{ display:flex; flex-direction:column; }
   .benefit-row{
-    display:grid; grid-template-columns:90px 1fr 1fr; gap:28px; align-items:start;
-    padding:32px 0; border-top:1px solid var(--line);
+    display:grid; grid-template-columns:90px 1fr 1fr; gap:28px; align-items:start; padding:32px 0;
+    border-top:1px solid var(--line); transition:padding-left 0.3s ease, background 0.3s ease;
   }
+  .benefit-row:hover{ padding-left:12px; background:rgba(227,167,92,0.03); }
   .benefit-row:last-child{ border-bottom:1px solid var(--line); }
   @media (max-width:760px){ .benefit-row{ grid-template-columns:60px 1fr; } .benefit-row .b-metric{ grid-column:2; } }
-  .b-index{ font-family:'Bebas Neue'; font-size:38px; color:var(--surface-2); -webkit-text-stroke:1px var(--muted); color:transparent; }
+  .b-index{ font-family:'Bebas Neue'; font-size:38px; -webkit-text-stroke:1px var(--muted); color:transparent; transition:all 0.3s ease; }
+  .benefit-row:hover .b-index{ -webkit-text-stroke:1px var(--gold-bright); text-shadow:0 0 20px rgba(227,167,92,0.4); }
   .b-title h3{ font-size:24px; font-family:'Inter'; font-weight:700; margin-bottom:8px; }
   .b-title p{ color:var(--muted); font-size:14.5px; }
   .b-metric{ font-family:'Space Mono'; }
@@ -204,10 +191,14 @@
   .b-metric .m-lbl{ font-size:12px; color:var(--muted); margin-top:4px; }
 
   /* ---------- PROCESS ---------- */
-  .process{ display:grid; grid-template-columns:repeat(4,1fr); gap:24px; }
+  .process{ display:grid; grid-template-columns:repeat(4,1fr); gap:24px; perspective:1200px; }
   @media (max-width:860px){ .process{ grid-template-columns:1fr 1fr; } }
   @media (max-width:520px){ .process{ grid-template-columns:1fr; } }
-  .step{ border:1px solid var(--line); border-radius:10px; padding:26px 22px; background:var(--surface); position:relative; }
+  .step{
+    border:1px solid var(--line); border-radius:10px; padding:26px 22px; background:var(--surface);
+    position:relative; transition:transform 0.4s cubic-bezier(.2,.9,.3,1.3), border-color 0.3s;
+  }
+  .step:hover{ transform:translateY(-10px) rotateX(4deg); border-color:rgba(227,167,92,0.35); }
   .step .step-num{ font-family:'Space Mono'; color:var(--crimson); font-size:12px; margin-bottom:18px; display:block; }
   .step h3{ font-size:20px; font-family:'Inter'; font-weight:700; margin-bottom:8px; }
   .step p{ color:var(--muted); font-size:13.5px; }
@@ -215,15 +206,22 @@
   /* ---------- CTA BAND ---------- */
   .cta-band{
     background:linear-gradient(120deg, var(--surface), #2a1f42 60%, var(--surface));
-    border-radius:16px; padding:64px 50px; text-align:center; position:relative; overflow:hidden;
-    border:1px solid var(--line);
+    border-radius:16px; padding:64px 50px; text-align:center; position:relative; overflow:hidden; border:1px solid var(--line);
   }
-  .cta-band h2{ font-size:clamp(30px,4.5vw,46px); margin-bottom:18px; }
-  .cta-band p{ color:var(--muted); margin-bottom:34px; }
+  .cta-band::before{
+    content:''; position:absolute; width:400px; height:400px; border-radius:50%;
+    background:radial-gradient(circle, rgba(227,167,92,0.18), transparent 70%);
+    top:-150px; left:-100px; animation:drift 10s ease-in-out infinite alternate;
+  }
+  @keyframes drift{ to{ transform:translate(60px, 40px); } }
+  .cta-band h2{ font-size:clamp(30px,4.5vw,46px); margin-bottom:18px; position:relative; }
+  .cta-band p{ color:var(--muted); margin-bottom:34px; position:relative; }
+  .cta-band .btn-primary{ position:relative; }
 
   footer{ border-top:1px solid var(--line); padding:50px 0 40px; }
   .foot-grid{ display:flex; justify-content:space-between; flex-wrap:wrap; gap:24px; align-items:center; }
   .foot-links{ display:flex; gap:26px; font-size:13px; color:var(--muted); }
+  .foot-links a{ transition:color 0.2s; }
   .foot-links a:hover{ color:var(--gold-bright); }
   .copyright{ font-size:12.5px; color:var(--muted); font-family:'Space Mono'; }
 </style>
@@ -243,6 +241,7 @@
 </nav>
 
 <header class="hero">
+  <canvas id="hero-canvas"></canvas>
   <div class="wrap hero-grid">
     <div>
       <div class="eyebrow"><span class="rec"></span> अभी 6 स्ट्रीमिंग ऐप्स बिल्ड हो रहे हैं</div>
@@ -259,23 +258,25 @@
       </div>
     </div>
 
-    <div class="stage">
-      <div class="screen">
-        <div class="screen-top">
-          <div class="app-name">आपका ऐप</div>
-          <div class="screen-tag mono">DIGITALZIRAKPUR TEST</div>
+    <div class="stage-holder">
+      <div class="stage" id="tiltStage">
+        <div class="screen">
+          <div class="screen-top">
+            <div class="app-name">आपका ऐप</div>
+            <div class="screen-tag mono">LIVE PREVIEW</div>
+          </div>
+          <div class="poster-row wide">
+            <div class="poster"><span class="runtime">S1 · EP4</span></div>
+            <div class="poster"><span class="runtime">2:14:00</span></div>
+          </div>
+          <div class="poster-row">
+            <div class="poster"><span class="runtime">45m</span></div>
+            <div class="poster"><span class="runtime">1:58</span></div>
+            <div class="poster"><span class="runtime">NEW</span></div>
+          </div>
+          <div class="progress"><span></span></div>
+          <div class="now-screening"><b>अभी चल रहा है</b>&nbsp;— आपकी अपनी लाइब्रेरी, आपके नियम, आपका मुनाफा</div>
         </div>
-        <div class="poster-row wide">
-          <div class="poster"><span class="runtime">S1 · EP4</span></div>
-          <div class="poster"><span class="runtime">2:14:00</span></div>
-        </div>
-        <div class="poster-row">
-          <div class="poster"><span class="runtime">45m</span></div>
-          <div class="poster"><span class="runtime">1:58</span></div>
-          <div class="poster"><span class="runtime">NEW</span></div>
-        </div>
-        <div class="progress"><span></span></div>
-        <div class="now-screening"><b>अभी चल रहा है</b>&nbsp;— आपकी अपनी लाइब्रेरी, आपके नियम, आपका मुनाफा</div>
       </div>
     </div>
   </div>
@@ -283,134 +284,61 @@
 
 <section id="build">
   <div class="wrap">
-    <div class="section-head">
+    <div class="section-head reveal">
       <span class="kicker">हम क्या बनाते हैं</span>
       <h2>एक स्ट्रीमिंग ऐप में जो कुछ भी होना चाहिए</h2>
       <p>हर हिस्सा शुरू से आपके कंटेंट और ऑडियंस के हिसाब से डिज़ाइन होता है — किसी टेम्पलेट की कॉपी नहीं।</p>
     </div>
 
     <div class="build-grid">
-      <div class="build-card">
-        <h3>वीडियो ऑन डिमांड</h3>
-        <p>अपलोड करते ही ऑटोमैटिक अलग-अलग क्वालिटी में एनकोड, ताकि हर दर्शक की इंटरनेट स्पीड पर स्मूद चले।</p>
-      </div>
-      <div class="build-card">
-        <h3>लाइव स्ट्रीमिंग</h3>
-        <p>इवेंट्स, मैच या शो को रियल टाइम में ब्रॉडकास्ट करें, साथ में लाइव चैट और व्यूअर काउंट।</p>
-      </div>
-      <div class="build-card">
-        <h3>सब्सक्रिप्शन और पेमेंट</h3>
-        <p>मासिक, सालाना या पे-पर-व्यू — भारत और विदेश दोनों के पेमेंट गेटवे इंटीग्रेटेड।</p>
-      </div>
-      <div class="build-card">
-        <h3>मल्टी-डिवाइस ऐप्स</h3>
-        <p>मोबाइल, वेब, और Smart TV (Fire TV, Android TV) — एक ही अकाउंट से हर स्क्रीन पर देखें।</p>
-      </div>
-      <div class="build-card">
-        <h3>रिकमेंडेशन इंजन</h3>
-        <p>हर यूज़र की देखने की आदत के हिसाब से होमपेज खुद बदलता है, जिससे लोग ऐप में ज़्यादा समय बिताते हैं।</p>
-      </div>
-      <div class="build-card">
-        <h3>एडमिन डैशबोर्ड</h3>
-        <p>कंटेंट अपलोड, यूज़र मैनेजमेंट, कमाई की रिपोर्ट — सब एक ही जगह से कंट्रोल करें।</p>
-      </div>
+      <div class="build-card tilt-card reveal"><span class="card-num mono">01</span><h3>वीडियो ऑन डिमांड</h3><p>अपलोड करते ही ऑटोमैटिक अलग-अलग क्वालिटी में एनकोड, ताकि हर दर्शक की इंटरनेट स्पीड पर स्मूद चले।</p></div>
+      <div class="build-card tilt-card reveal"><span class="card-num mono">02</span><h3>लाइव स्ट्रीमिंग</h3><p>इवेंट्स, मैच या शो को रियल टाइम में ब्रॉडकास्ट करें, साथ में लाइव चैट और व्यूअर काउंट।</p></div>
+      <div class="build-card tilt-card reveal"><span class="card-num mono">03</span><h3>सब्सक्रिप्शन और पेमेंट</h3><p>मासिक, सालाना या पे-पर-व्यू — भारत और विदेश दोनों के पेमेंट गेटवे इंटीग्रेटेड।</p></div>
+      <div class="build-card tilt-card reveal"><span class="card-num mono">04</span><h3>मल्टी-डिवाइस ऐप्स</h3><p>मोबाइल, वेब, और Smart TV (Fire TV, Android TV) — एक ही अकाउंट से हर स्क्रीन पर देखें।</p></div>
+      <div class="build-card tilt-card reveal"><span class="card-num mono">05</span><h3>रिकमेंडेशन इंजन</h3><p>हर यूज़र की देखने की आदत के हिसाब से होमपेज खुद बदलता है, जिससे लोग ऐप में ज़्यादा समय बिताते हैं।</p></div>
+      <div class="build-card tilt-card reveal"><span class="card-num mono">06</span><h3>एडमिन डैशबोर्ड</h3><p>कंटेंट अपलोड, यूज़र मैनेजमेंट, कमाई की रिपोर्ट — सब एक ही जगह से कंट्रोल करें।</p></div>
     </div>
   </div>
 </section>
 
 <section id="benefits" class="benefits">
   <div class="wrap">
-    <div class="section-head">
+    <div class="section-head reveal">
       <span class="kicker">क्यों बनवाएं</span>
       <h2>अपना स्ट्रीमिंग ऐप होने के फायदे</h2>
       <p>YouTube या सोशल मीडिया पर निर्भर रहने की जगह — अपने कंटेंट, ऑडियंस और कमाई पर पूरा कंट्रोल रखें।</p>
     </div>
 
     <div class="benefit-list">
-      <div class="benefit-row">
-        <div class="b-index">A</div>
-        <div class="b-title">
-          <h3>सीधी कमाई, बिना बिचौलिए के</h3>
-          <p>सब्सक्रिप्शन और पेमेंट सीधे आपके अकाउंट में आते हैं। किसी और प्लेटफॉर्म का कमीशन नहीं कटता।</p>
-        </div>
-        <div class="b-metric"><span class="m-num mono">0%</span><span class="m-lbl">थर्ड-पार्टी कमीशन</span></div>
-      </div>
-
-      <div class="benefit-row">
-        <div class="b-index">B</div>
-        <div class="b-title">
-          <h3>अपने यूज़र्स का डेटा आपके पास</h3>
-          <p>कौन क्या देखता है, कितनी देर देखता है — ये पूरा डेटा आपकी प्रॉपर्टी है, किसी और प्लेटफॉर्म का नहीं।</p>
-        </div>
-        <div class="b-metric"><span class="m-num mono">100%</span><span class="m-lbl">डेटा आपका</span></div>
-      </div>
-
-      <div class="benefit-row">
-        <div class="b-index">C</div>
-        <div class="b-title">
-          <h3>ब्रांड पूरी तरह आपका</h3>
-          <p>ऐप का नाम, लोगो, रंग, हर चीज़ आपकी पहचान से मेल खाती है — दर्शकों को हमेशा पता रहता है ये आपका प्लेटफॉर्म है।</p>
-        </div>
-        <div class="b-metric"><span class="m-num mono">1</span><span class="m-lbl">आपका अपना ब्रांड</span></div>
-      </div>
-
-      <div class="benefit-row">
-        <div class="b-index">D</div>
-        <div class="b-title">
-          <h3>एल्गोरिद्म के भरोसे नहीं रहना</h3>
-          <p>सोशल मीडिया पर रीच अचानक गिर सकती है। अपने ऐप में आपकी ऑडियंस हमेशा आप तक सीधी पहुंच में रहती है।</p>
-        </div>
-        <div class="b-metric"><span class="m-num mono">24/7</span><span class="m-lbl">डायरेक्ट पहुंच</span></div>
-      </div>
-
-      <div class="benefit-row">
-        <div class="b-index">E</div>
-        <div class="b-title">
-          <h3>ऑफलाइन डाउनलोड</h3>
-          <p>दर्शक एपिसोड डाउनलोड करके बिना इंटरनेट के भी देख सकते हैं — कम स्पीड वाले इलाकों में भी जुड़ाव बना रहता है।</p>
-        </div>
-        <div class="b-metric"><span class="m-num mono">∞</span><span class="m-lbl">कहीं भी देखें</span></div>
-      </div>
+      <div class="benefit-row reveal"><div class="b-index">A</div><div class="b-title"><h3>सीधी कमाई, बिना बिचौलिए के</h3><p>सब्सक्रिप्शन और पेमेंट सीधे आपके अकाउंट में आते हैं। किसी और प्लेटफॉर्म का कमीशन नहीं कटता।</p></div><div class="b-metric"><span class="m-num mono">0%</span><span class="m-lbl">थर्ड-पार्टी कमीशन</span></div></div>
+      <div class="benefit-row reveal"><div class="b-index">B</div><div class="b-title"><h3>अपने यूज़र्स का डेटा आपके पास</h3><p>कौन क्या देखता है, कितनी देर देखता है — ये पूरा डेटा आपकी प्रॉपर्टी है, किसी और प्लेटफॉर्म का नहीं।</p></div><div class="b-metric"><span class="m-num mono">100%</span><span class="m-lbl">डेटा आपका</span></div></div>
+      <div class="benefit-row reveal"><div class="b-index">C</div><div class="b-title"><h3>ब्रांड पूरी तरह आपका</h3><p>ऐप का नाम, लोगो, रंग, हर चीज़ आपकी पहचान से मेल खाती है — दर्शकों को हमेशा पता रहता है ये आपका प्लेटफॉर्म है।</p></div><div class="b-metric"><span class="m-num mono">1</span><span class="m-lbl">आपका अपना ब्रांड</span></div></div>
+      <div class="benefit-row reveal"><div class="b-index">D</div><div class="b-title"><h3>एल्गोरिद्म के भरोसे नहीं रहना</h3><p>सोशल मीडिया पर रीच अचानक गिर सकती है। अपने ऐप में आपकी ऑडियंस हमेशा आप तक सीधी पहुंच में रहती है।</p></div><div class="b-metric"><span class="m-num mono">24/7</span><span class="m-lbl">डायरेक्ट पहुंच</span></div></div>
+      <div class="benefit-row reveal"><div class="b-index">E</div><div class="b-title"><h3>ऑफलाइन डाउनलोड</h3><p>दर्शक एपिसोड डाउनलोड करके बिना इंटरनेट के भी देख सकते हैं — कम स्पीड वाले इलाकों में भी जुड़ाव बना रहता है।</p></div><div class="b-metric"><span class="m-num mono">∞</span><span class="m-lbl">कहीं भी देखें</span></div></div>
     </div>
   </div>
 </section>
 
 <section id="process">
   <div class="wrap">
-    <div class="section-head">
+    <div class="section-head reveal">
       <span class="kicker">प्रोसेस</span>
       <h2>आइडिया से लॉन्च तक</h2>
       <p>चार साफ स्टेप्स, हर एक के आखिर में आप देखते और अप्रूव करते हैं।</p>
     </div>
 
     <div class="process">
-      <div class="step">
-        <span class="step-num mono">STEP 01</span>
-        <h3>डिस्कवरी कॉल</h3>
-        <p>आपका कंटेंट, ऑडियंस और बिज़नेस मॉडल समझते हैं — फीचर लिस्ट फाइनल होती है।</p>
-      </div>
-      <div class="step">
-        <span class="step-num mono">STEP 02</span>
-        <h3>डिज़ाइन</h3>
-        <p>आपके ब्रांड के हिसाब से ऐप का लुक और फील तैयार होता है, आपकी मंज़ूरी के साथ।</p>
-      </div>
-      <div class="step">
-        <span class="step-num mono">STEP 03</span>
-        <h3>डेवलपमेंट</h3>
-        <p>वीडियो इंफ्रास्ट्रक्चर, पेमेंट, ऐप्स — सब बनते हैं, हर हफ्ते अपडेट मिलता है।</p>
-      </div>
-      <div class="step">
-        <span class="step-num mono">STEP 04</span>
-        <h3>लॉन्च</h3>
-        <p>ऐप स्टोर, प्ले स्टोर और वेब पर लाइव — साथ में लॉन्च के बाद सपोर्ट।</p>
-      </div>
+      <div class="step reveal"><span class="step-num mono">STEP 01</span><h3>डिस्कवरी कॉल</h3><p>आपका कंटेंट, ऑडियंस और बिज़नेस मॉडल समझते हैं — फीचर लिस्ट फाइनल होती है।</p></div>
+      <div class="step reveal"><span class="step-num mono">STEP 02</span><h3>डिज़ाइन</h3><p>आपके ब्रांड के हिसाब से ऐप का लुक और फील तैयार होता है, आपकी मंज़ूरी के साथ।</p></div>
+      <div class="step reveal"><span class="step-num mono">STEP 03</span><h3>डेवलपमेंट</h3><p>वीडियो इंफ्रास्ट्रक्चर, पेमेंट, ऐप्स — सब बनते हैं, हर हफ्ते अपडेट मिलता है।</p></div>
+      <div class="step reveal"><span class="step-num mono">STEP 04</span><h3>लॉन्च</h3><p>ऐप स्टोर, प्ले स्टोर और वेब पर लाइव — साथ में लॉन्च के बाद सपोर्ट।</p></div>
     </div>
   </div>
 </section>
 
 <section id="contact">
   <div class="wrap">
-    <div class="cta-band">
+    <div class="cta-band reveal">
       <h2>अपना स्ट्रीमिंग ऐप बनाने के लिए तैयार हैं?</h2>
       <p>डिस्कवरी कॉल बुक करें — 30 मिनट में बताएंगे कि आपके कंटेंट के लिए सबसे सही रास्ता क्या है।</p>
       <a href="#" class="btn-primary">कॉल बुक करें</a>
@@ -430,6 +358,119 @@
     <div class="copyright">© 2026 STREAMFORGE STUDIO</div>
   </div>
 </footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- scroll reveal ---- */
+  var els = document.querySelectorAll('.reveal');
+  if('IntersectionObserver' in window && !reduced){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { threshold:0.15 });
+    els.forEach(function(el){ io.observe(el); });
+  } else {
+    els.forEach(function(el){ el.classList.add('in'); });
+  }
+
+  /* ---- 3D tilt on hero device ---- */
+  var stage = document.getElementById('tiltStage');
+  if(stage && !reduced && window.innerWidth > 820){
+    var holder = stage.parentElement;
+    holder.addEventListener('mousemove', function(e){
+      var r = holder.getBoundingClientRect();
+      var x = (e.clientX - r.left) / r.width - 0.5;
+      var y = (e.clientY - r.top) / r.height - 0.5;
+      stage.style.transform = 'rotateY(' + (x*14) + 'deg) rotateX(' + (-y*14) + 'deg)';
+    });
+    holder.addEventListener('mouseleave', function(){
+      stage.style.transform = 'rotateY(0deg) rotateX(0deg)';
+    });
+  }
+
+  /* ---- 3D tilt on build cards + glow follow ---- */
+  document.querySelectorAll('.tilt-card').forEach(function(card){
+    if(reduced) return;
+    card.addEventListener('mousemove', function(e){
+      var r = card.getBoundingClientRect();
+      var x = e.clientX - r.left, y = e.clientY - r.top;
+      var cx = x / r.width - 0.5, cy = y / r.height - 0.5;
+      card.style.transform = 'rotateY(' + (cx*10) + 'deg) rotateX(' + (-cy*10) + 'deg) translateZ(0)';
+      card.style.setProperty('--mx', x + 'px');
+      card.style.setProperty('--my', y + 'px');
+    });
+    card.addEventListener('mouseleave', function(){
+      card.style.transform = 'rotateY(0deg) rotateX(0deg)';
+    });
+  });
+
+  /* ---- Three.js floating cinema rings in hero ---- */
+  var canvas = document.getElementById('hero-canvas');
+  if(canvas && window.THREE && !reduced){
+    var hero = canvas.parentElement;
+    var w = hero.clientWidth, h = hero.clientHeight;
+
+    var renderer = new THREE.WebGLRenderer({ canvas:canvas, alpha:true, antialias:true });
+    renderer.setSize(w, h);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(45, w/h, 0.1, 100);
+    camera.position.set(0, 0, 14);
+
+    var group = new THREE.Group();
+    scene.add(group);
+
+    var goldMat = new THREE.MeshBasicMaterial({ color:0xE3A75C, transparent:true, opacity:0.35, wireframe:true });
+    var crimsonMat = new THREE.MeshBasicMaterial({ color:0xB23A48, transparent:true, opacity:0.28, wireframe:true });
+
+    var ring1 = new THREE.Mesh(new THREE.TorusGeometry(4.2, 0.05, 16, 100), goldMat);
+    ring1.position.set(7, 1.5, -4);
+    ring1.rotation.x = 1.1;
+    group.add(ring1);
+
+    var ring2 = new THREE.Mesh(new THREE.TorusGeometry(2.6, 0.045, 16, 100), crimsonMat);
+    ring2.position.set(-6.5, -2, -3);
+    ring2.rotation.x = 0.6; ring2.rotation.y = 0.8;
+    group.add(ring2);
+
+    var ring3 = new THREE.Mesh(new THREE.IcosahedronGeometry(1.3, 0), goldMat.clone());
+    ring3.material.opacity = 0.22;
+    ring3.position.set(6, -3, -2);
+    group.add(ring3);
+
+    var mouseX = 0, mouseY = 0;
+    hero.addEventListener('mousemove', function(e){
+      var r = hero.getBoundingClientRect();
+      mouseX = (e.clientX - r.left) / r.width - 0.5;
+      mouseY = (e.clientY - r.top) / r.height - 0.5;
+    });
+
+    function animate(){
+      requestAnimationFrame(animate);
+      ring1.rotation.z += 0.0025;
+      ring1.rotation.y += 0.0012;
+      ring2.rotation.z -= 0.002;
+      ring3.rotation.x += 0.004;
+      ring3.rotation.y += 0.003;
+      group.rotation.y += (mouseX*0.3 - group.rotation.y) * 0.03;
+      group.rotation.x += (-mouseY*0.2 - group.rotation.x) * 0.03;
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', function(){
+      var nw = hero.clientWidth, nh = hero.clientHeight;
+      camera.aspect = nw/nh; camera.updateProjectionMatrix();
+      renderer.setSize(nw, nh);
+    });
+  }
+})();
+</script>
 
 </body>
 </html>
