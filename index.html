@@ -152,35 +152,56 @@
   }
 
   /* ---------- SECTION SHELL ---------- */
-  section{ padding:90px 0; }
-  .section-head{ max-width:640px; margin-bottom:48px; }
+  section{ padding:70px 0; }
+  .section-head{ max-width:640px; margin-bottom:32px; }
   .kicker{ font-family:'Space Mono'; font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--red); display:block; margin-bottom:12px; }
-  .section-head h2{ font-size:clamp(28px,4vw,44px); line-height:1.05; }
-  .section-head p{ color:var(--muted); margin-top:14px; font-size:15.5px; max-width:560px; }
+  .section-head h2{ font-size:clamp(26px,3.6vw,40px); line-height:1.05; }
+  .section-head p{ color:var(--muted); margin-top:12px; font-size:14.5px; max-width:560px; }
 
-  @media (max-width:600px){ section{ padding:60px 0; } .section-head{ margin-bottom:32px; } }
+  @media (max-width:600px){ section{ padding:44px 0; } .section-head{ margin-bottom:24px; } }
 
-  /* ---------- SMALL EXPLANATION BOXES (build + benefits) ---------- */
-  .box-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:14px; }
+  /* ---------- SMALL COLORFUL EXPLANATION BOXES (build + benefits) ---------- */
+  .box-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; }
   @media (max-width:900px){ .box-grid{ grid-template-columns:repeat(2,1fr); } }
-  @media (max-width:560px){ .box-grid{ grid-template-columns:1fr; } }
+  @media (max-width:560px){ .box-grid{ grid-template-columns:1fr; gap:10px; } }
 
   .info-box{
-    background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:22px 20px;
-    transform-style:preserve-3d; transition:transform 0.12s ease-out, box-shadow 0.3s ease, border-color 0.3s ease;
+    background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--accent, var(--red));
+    border-radius:8px; padding:16px 16px 0; transform-style:preserve-3d;
+    transition:transform 0.12s ease-out, box-shadow 0.3s ease, border-color 0.3s ease;
     position:relative; overflow:hidden;
   }
   .info-box::after{
-    content:''; position:absolute; inset:0; opacity:0; border-radius:10px;
-    background:radial-gradient(220px circle at var(--mx,50%) var(--my,50%), rgba(229,9,20,0.16), transparent 60%);
+    content:''; position:absolute; inset:0; opacity:0; border-radius:8px;
+    background:radial-gradient(200px circle at var(--mx,50%) var(--my,50%), color-mix(in srgb, var(--accent, var(--red)) 22%, transparent), transparent 60%);
     transition:opacity 0.3s ease; pointer-events:none;
   }
-  .info-box:hover{ border-color:rgba(229,9,20,0.45); box-shadow:0 20px 40px -18px rgba(0,0,0,0.6); }
+  .info-box:hover{ box-shadow:0 18px 36px -18px rgba(0,0,0,0.65); }
   .info-box:hover::after{ opacity:1; }
-  .info-box .b-num{ font-family:'Space Mono'; font-size:11px; color:var(--red-bright); margin-bottom:12px; display:block; transform:translateZ(16px); }
-  .info-box h3{ font-size:19px; font-family:'Inter'; font-weight:700; margin-bottom:9px; transform:translateZ(16px); line-height:1.25; }
-  .info-box p{ color:var(--muted); font-size:13.5px; transform:translateZ(16px); line-height:1.55; }
-  .info-box .b-metric{ margin-top:14px; padding-top:12px; border-top:1px solid var(--line); font-family:'Space Mono'; font-size:11px; color:var(--red-bright); transform:translateZ(16px); }
+  .info-box .b-num{
+    font-family:'Space Mono'; font-size:10px; font-weight:700; letter-spacing:0.05em; color:var(--accent, var(--red-bright));
+    margin-bottom:8px; display:inline-block; transform:translateZ(16px);
+    background:color-mix(in srgb, var(--accent, var(--red)) 16%, transparent); padding:3px 8px; border-radius:4px;
+  }
+  .info-box h3{
+    font-size:20px; font-family:'Bebas Neue'; font-weight:400; letter-spacing:0.02em; margin-bottom:6px;
+    transform:translateZ(16px); line-height:1.1; color:var(--text);
+  }
+  .info-box p{ color:var(--muted); font-size:12.5px; transform:translateZ(16px); line-height:1.45; margin-bottom:14px; }
+
+  /* animated scrolling ticker strip at the bottom of each box */
+  .b-ticker{
+    margin:0 -16px; padding:8px 0; border-top:1px solid var(--line);
+    background:color-mix(in srgb, var(--accent, var(--red)) 10%, transparent);
+    overflow:hidden; white-space:nowrap; transform:translateZ(10px);
+  }
+  .b-ticker .b-ticker-track{ display:inline-block; animation:ticker-scroll 9s linear infinite; }
+  .info-box:hover .b-ticker .b-ticker-track{ animation-play-state:paused; }
+  .b-ticker span{
+    font-family:'Space Mono'; font-size:10.5px; font-weight:700; color:var(--accent, var(--red-bright));
+    padding:0 16px; letter-spacing:0.03em;
+  }
+  @keyframes ticker-scroll{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
 
   /* ---------- PROCESS ---------- */
   .process{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; perspective:1200px; }
@@ -307,35 +328,41 @@
     </div>
 
     <div class="box-grid">
-      <div class="info-box tilt-box reveal">
+      <div class="info-box tilt-box reveal" style="--accent:#E50914">
         <span class="b-num mono">01 / VOD</span>
         <h3>वीडियो ऑन डिमांड</h3>
-        <p>आप जो भी वीडियो अपलोड करते हैं, वो अपने आप अलग-अलग क्वालिटी (480p से 4K तक) में एनकोड हो जाता है, ताकि हर दर्शक को उसकी इंटरनेट स्पीड के हिसाब से बिना रुके, बिना बफरिंग के प्लेबैक मिले।</p>
+        <p>अपलोड करते ही 480p से 4K तक ऑटो-एनकोड, बिना बफरिंग प्लेबैक।</p>
+        <div class="b-ticker"><span class="b-ticker-track"><span>⚡ ऑटो एनकोडिंग</span><span>🎞️ 4K तक</span><span>📶 ज़ीरो बफरिंग</span><span>⚡ ऑटो एनकोडिंग</span><span>🎞️ 4K तक</span><span>📶 ज़ीरो बफरिंग</span></span></div>
       </div>
-      <div class="info-box tilt-box reveal">
+      <div class="info-box tilt-box reveal" style="--accent:#F5A623">
         <span class="b-num mono">02 / LIVE</span>
         <h3>लाइव स्ट्रीमिंग</h3>
-        <p>मैच, कॉन्सर्ट या कोई भी इवेंट रियल टाइम में सीधा प्रसारित करें। साथ में लाइव चैट, व्यूअर काउंट और रिकॉर्डिंग अपने आप सेव होकर बाद में VOD लाइब्रेरी में जुड़ जाती है।</p>
+        <p>इवेंट सीधा प्रसारित करें, लाइव चैट के साथ, रिकॉर्डिंग अपने आप VOD में सेव।</p>
+        <div class="b-ticker"><span class="b-ticker-track"><span>🔴 रियल टाइम</span><span>💬 लाइव चैट</span><span>👀 व्यूअर काउंट</span><span>🔴 रियल टाइम</span><span>💬 लाइव चैट</span><span>👀 व्यूअर काउंट</span></span></div>
       </div>
-      <div class="info-box tilt-box reveal">
+      <div class="info-box tilt-box reveal" style="--accent:#8B5CF6">
         <span class="b-num mono">03 / PAY</span>
-        <h3>सब्सक्रिप्शन और पेमेंट</h3>
-        <p>मासिक, सालाना या पे-पर-व्यू मॉडल में से कोई भी चुनें। भारत के UPI/कार्ड और विदेशी पेमेंट गेटवे दोनों इंटीग्रेटेड होते हैं, ऑटो-रिन्यूअल के साथ।</p>
+        <h3>सब्सक्रिप्शन</h3>
+        <p>मासिक, सालाना या पे-पर-व्यू। UPI, कार्ड, विदेशी गेटवे — सब इंटीग्रेटेड।</p>
+        <div class="b-ticker"><span class="b-ticker-track"><span>💳 UPI/कार्ड</span><span>🔁 ऑटो-रिन्यूअल</span><span>🌍 ग्लोबल पेमेंट</span><span>💳 UPI/कार्ड</span><span>🔁 ऑटो-रिन्यूअल</span><span>🌍 ग्लोबल पेमेंट</span></span></div>
       </div>
-      <div class="info-box tilt-box reveal">
+      <div class="info-box tilt-box reveal" style="--accent:#2E9BF0">
         <span class="b-num mono">04 / MULTI</span>
-        <h3>मल्टी-डिवाइस ऐप्स</h3>
-        <p>मोबाइल (Android/iOS), वेब ब्राउज़र और Smart TV (Fire TV, Android TV) के लिए अलग-अलग नेटिव ऐप बनते हैं — एक ही लॉगिन से हर स्क्रीन पर वहीं से देखना जारी रखें जहां छोड़ा था।</p>
+        <h3>मल्टी-डिवाइस</h3>
+        <p>मोबाइल, वेब, Smart TV — एक लॉगिन से हर स्क्रीन पर वहीं से देखें।</p>
+        <div class="b-ticker"><span class="b-ticker-track"><span>📱 iOS/Android</span><span>📺 Smart TV</span><span>💻 वेब ऐप</span><span>📱 iOS/Android</span><span>📺 Smart TV</span><span>💻 वेब ऐप</span></span></div>
       </div>
-      <div class="info-box tilt-box reveal">
+      <div class="info-box tilt-box reveal" style="--accent:#2ECC71">
         <span class="b-num mono">05 / AI</span>
-        <h3>रिकमेंडेशन इंजन</h3>
-        <p>हर यूज़र की देखने की आदत ट्रैक होकर होमपेज को पर्सनलाइज़ करती है, जिससे लोग ज़्यादा कंटेंट खोजते हैं और ऐप में औसतन ज़्यादा समय बिताते हैं।</p>
+        <h3>रिकमेंडेशन</h3>
+        <p>देखने की आदत से होमपेज पर्सनलाइज़, ज़्यादा वॉच-टाइम की गारंटी।</p>
+        <div class="b-ticker"><span class="b-ticker-track"><span>🎯 पर्सनलाइज़्ड</span><span>📈 ज़्यादा वॉच-टाइम</span><span>🤖 AI बेस्ड</span><span>🎯 पर्सनलाइज़्ड</span><span>📈 ज़्यादा वॉच-टाइम</span><span>🤖 AI बेस्ड</span></span></div>
       </div>
-      <div class="info-box tilt-box reveal">
+      <div class="info-box tilt-box reveal" style="--accent:#FF3D71">
         <span class="b-num mono">06 / ADMIN</span>
         <h3>एडमिन डैशबोर्ड</h3>
-        <p>कंटेंट अपलोड, यूज़र मैनेजमेंट, सब्सक्रिप्शन रिपोर्ट और कमाई का पूरा एनालिटिक्स — सब कुछ एक सिंगल डैशबोर्ड से कंट्रोल होता है, बिना किसी टेक्निकल जानकारी के।</p>
+        <p>अपलोड, यूज़र, कमाई — सब एक डैशबोर्ड से, बिना टेक्निकल नॉलेज के।</p>
+        <div class="b-ticker"><span class="b-ticker-track"><span>📊 फुल एनालिटिक्स</span><span>👥 यूज़र मैनेजमेंट</span><span>💰 कमाई रिपोर्ट</span><span>📊 फुल एनालिटिक्स</span><span>👥 यूज़र मैनेजमेंट</span><span>💰 कमाई रिपोर्ट</span></span></div>
       </div>
     </div>
   </div>
@@ -350,35 +377,35 @@
     </div>
 
     <div class="box-grid">
-      <div class="info-box tilt-box reveal">
-        <h3>सीधी कमाई, बिना बिचौलिए के</h3>
-        <p>सब्सक्रिप्शन और पेमेंट सीधे आपके बैंक अकाउंट में आते हैं। किसी और प्लेटफॉर्म का कमीशन नहीं कटता, इसलिए हर रुपये की कमाई पूरी आपकी रहती है।</p>
-        <div class="b-metric">0% थर्ड-पार्टी कमीशन</div>
+      <div class="info-box tilt-box reveal" style="--accent:#E50914">
+        <h3>सीधी कमाई</h3>
+        <p>पेमेंट सीधे आपके अकाउंट में — किसी का कमीशन नहीं कटता।</p>
+        <div class="b-ticker"><span class="b-ticker-track"><span>💰 0% कमीशन</span><span>🏦 डायरेक्ट पेआउट</span><span>💰 0% कमीशन</span><span>🏦 डायरेक्ट पेआउट</span></span></div>
       </div>
-      <div class="info-box tilt-box reveal">
-        <h3>अपने यूज़र्स का डेटा आपके पास</h3>
-        <p>कौन क्या देखता है, कब देखता है, कितनी देर देखता है — ये पूरा डेटा आपकी प्रॉपर्टी है, किसी और कंपनी के सर्वर पर नहीं जाता।</p>
-        <div class="b-metric">100% डेटा आपका</div>
+      <div class="info-box tilt-box reveal" style="--accent:#F5A623">
+        <h3>डेटा आपका</h3>
+        <p>कौन क्या देखता है — ये डेटा पूरी तरह आपकी प्रॉपर्टी है।</p>
+        <div class="b-ticker"><span class="b-ticker-track"><span>🔒 100% ओनरशिप</span><span>📊 फुल इनसाइट्स</span><span>🔒 100% ओनरशिप</span><span>📊 फुल इनसाइट्स</span></span></div>
       </div>
-      <div class="info-box tilt-box reveal">
-        <h3>ब्रांड पूरी तरह आपका</h3>
-        <p>ऐप का नाम, लोगो, रंग, हर छोटी चीज़ आपकी पहचान से मेल खाती है — दर्शकों को हमेशा साफ पता रहता है कि ये आपका ही प्लेटफॉर्म है।</p>
-        <div class="b-metric">1 यूनीक ब्रांड आइडेंटिटी</div>
+      <div class="info-box tilt-box reveal" style="--accent:#8B5CF6">
+        <h3>ब्रांड आपका</h3>
+        <p>नाम, लोगो, रंग — हर चीज़ आपकी पहचान से मेल खाती है।</p>
+        <div class="b-ticker"><span class="b-ticker-track"><span>🎨 फुल कस्टम</span><span>🏷️ यूनीक आइडेंटिटी</span><span>🎨 फुल कस्टम</span><span>🏷️ यूनीक आइडेंटिटी</span></span></div>
       </div>
-      <div class="info-box tilt-box reveal">
-        <h3>एल्गोरिद्म के भरोसे नहीं रहना</h3>
-        <p>सोशल मीडिया पर रीच किसी भी दिन अचानक गिर सकती है। अपने ऐप में आपकी ऑडियंस हमेशा नोटिफिकेशन के ज़रिए सीधी आप तक पहुंच में रहती है।</p>
-        <div class="b-metric">24/7 डायरेक्ट पहुंच</div>
+      <div class="info-box tilt-box reveal" style="--accent:#2E9BF0">
+        <h3>डायरेक्ट पहुंच</h3>
+        <p>एल्गोरिद्म पर निर्भर नहीं — नोटिफिकेशन से सीधे ऑडियंस तक।</p>
+        <div class="b-ticker"><span class="b-ticker-track"><span>🔔 पुश नोटिफिकेशन</span><span>⏰ 24/7 कनेक्ट</span><span>🔔 पुश नोटिफिकेशन</span><span>⏰ 24/7 कनेक्ट</span></span></div>
       </div>
-      <div class="info-box tilt-box reveal">
-        <h3>ऑफलाइन डाउनलोड</h3>
-        <p>दर्शक एपिसोड पहले से डाउनलोड करके बिना इंटरनेट के भी देख सकते हैं — इससे कम स्पीड वाले इलाकों में भी दर्शकों का जुड़ाव बना रहता है।</p>
-        <div class="b-metric">कहीं भी, कभी भी देखें</div>
+      <div class="info-box tilt-box reveal" style="--accent:#2ECC71">
+        <h3>ऑफलाइन देखें</h3>
+        <p>डाउनलोड करके बिना इंटरनेट भी — कम स्पीड इलाकों में भी जुड़ाव बना रहे।</p>
+        <div class="b-ticker"><span class="b-ticker-track"><span>⬇️ डाउनलोड करें</span><span>📶 नो इंटरनेट ज़रूरी नहीं</span><span>⬇️ डाउनलोड करें</span><span>📶 नो इंटरनेट ज़रूरी नहीं</span></span></div>
       </div>
-      <div class="info-box tilt-box reveal">
-        <h3>ग्रोथ के साथ स्केल</h3>
-        <p>आज 100 यूज़र्स हों या कल 1 लाख — इंफ्रास्ट्रक्चर अपने आप स्केल होता है, बिना आपको सर्वर या तकनीक की चिंता किए।</p>
-        <div class="b-metric">ऑटो-स्केलिंग इंफ्रा</div>
+      <div class="info-box tilt-box reveal" style="--accent:#FF3D71">
+        <h3>ऑटो-स्केल</h3>
+        <p>100 यूज़र हों या 1 लाख — इंफ्रास्ट्रक्चर खुद स्केल होता है।</p>
+        <div class="b-ticker"><span class="b-ticker-track"><span>📈 अनलिमिटेड ग्रोथ</span><span>⚙️ ज़ीरो चिंता</span><span>📈 अनलिमिटेड ग्रोथ</span><span>⚙️ ज़ीरो चिंता</span></span></div>
       </div>
     </div>
   </div>
