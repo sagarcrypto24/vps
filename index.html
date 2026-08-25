@@ -51,13 +51,13 @@
 
   /* ---------- MAIN (swap at top, single page) ---------- */
   main{ flex:1; display:flex; align-items:flex-start; justify-content:center; padding:26px 16px 40px; position:relative; z-index:2; }
-  .swap-wrap{ width:100%; max-width:420px; perspective:1200px; }
+  .swap-wrap{ width:100%; max-width:360px; perspective:1200px; }
 
   .pool-viz{ position:relative; width:100%; max-width:220px; height:70px; margin:0 auto 16px; }
   .pool-orb{
     position:absolute; top:50%; width:46px; height:46px; border-radius:50%;
     display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono'; font-weight:700; font-size:9px;
-    box-shadow:0 0 30px -4px currentColor; animation:orbit 4.5s ease-in-out infinite;
+    box-shadow:0 0 34px -2px currentColor, 0 0 8px 0 currentColor; animation:orbit 4.5s ease-in-out infinite;
   }
   .pool-orb.a{ left:22%; transform:translate(-50%,-50%); background:radial-gradient(circle at 35% 30%, #4EE8D4, var(--teal)); color:var(--teal); animation-delay:0s; }
   .pool-orb.b{ left:78%; transform:translate(-50%,-50%); background:radial-gradient(circle at 35% 30%, #B79CFF, var(--violet)); color:var(--violet); animation-delay:-2.25s; }
@@ -68,10 +68,13 @@
   @keyframes orbit{ 0%,100%{ transform:translate(-50%,-50%) scale(1); } 50%{ transform:translate(-50%,-58%) scale(1.08); } }
 
   /* ---------- 3D SWAP CARD ---------- */
-  .card-stage{ transform-style:preserve-3d; transition:transform 0.12s ease-out; }
+  .card-stage{ transform-style:preserve-3d; transition:transform 0.12s ease-out; animation:card-in 0.7s cubic-bezier(.16,.84,.44,1) both; }
+  @keyframes card-in{ from{ opacity:0; transform:translateY(24px) scale(0.96); } to{ opacity:1; transform:translateY(0) scale(1); } }
+  .pool-viz{ animation:pool-in 0.8s cubic-bezier(.16,.84,.44,1) both 0.1s; }
+  @keyframes pool-in{ from{ opacity:0; transform:translateY(-10px); } to{ opacity:1; transform:translateY(0); } }
   .card{
     position:relative; background:rgba(19,23,32,0.75); backdrop-filter:blur(18px);
-    border-radius:20px; padding:20px; isolation:isolate;
+    border-radius:20px; padding:28px 20px; isolation:isolate;
     box-shadow:0 30px 70px -25px rgba(0,0,0,0.7);
   }
   .card::before{
@@ -85,9 +88,28 @@
 
   .card-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; transform:translateZ(24px); }
   .card-head h2{ font-size:18px; font-weight:700; }
-  .settings-icon{ width:32px; height:32px; border-radius:8px; background:var(--surface-2); display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:14px; }
+  .settings-icon{ width:34px; height:34px; border-radius:9px; background:var(--surface-2); display:flex; align-items:center; justify-content:center; color:var(--muted); transition:color 0.2s, background 0.2s, transform 0.3s; position:relative; }
+  .settings-icon:hover{ color:var(--teal); background:var(--surface); }
+  .settings-icon.open{ color:var(--teal); background:var(--surface); transform:rotate(45deg); }
+  .settings-icon svg{ width:17px; height:17px; transition:transform 0.3s; }
+  .settings-icon.open svg{ transform:rotate(-45deg); }
 
-  .token-box{ background:var(--surface-2); border:1px solid transparent; border-radius:14px; padding:15px; transition:border-color 0.2s, box-shadow 0.2s; transform:translateZ(20px); }
+  .settings-panel{
+    position:absolute; top:52px; right:0; width:220px; background:var(--surface); border:1px solid var(--line);
+    border-radius:12px; padding:14px; box-shadow:0 20px 50px -16px rgba(0,0,0,0.7); z-index:20;
+    opacity:0; transform:translateY(-8px) scale(0.97); pointer-events:none; transition:all 0.2s ease;
+  }
+  .settings-panel.show{ opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
+  .settings-panel .sp-label{ font-size:11px; color:var(--muted); font-family:'JetBrains Mono'; margin-bottom:8px; }
+  .sp-options{ display:flex; gap:6px; }
+  .sp-opt{
+    flex:1; background:var(--surface-2); border:1px solid transparent; color:var(--muted); font-family:'JetBrains Mono';
+    font-size:12px; font-weight:600; padding:7px 0; border-radius:7px; transition:all 0.2s; text-align:center;
+  }
+  .sp-opt.active{ background:rgba(45,212,191,0.14); border-color:var(--teal); color:var(--teal); }
+  .sp-opt:hover{ color:var(--text); }
+
+  .token-box{ background:var(--surface-2); border:1px solid transparent; border-radius:14px; padding:18px 15px; transition:border-color 0.2s, box-shadow 0.2s; transform:translateZ(20px); }
   .token-box:focus-within{ border-color:rgba(45,212,191,0.45); box-shadow:0 0 0 3px rgba(45,212,191,0.1); }
   .token-box .row1{ display:flex; justify-content:space-between; align-items:center; margin-bottom:9px; }
   .token-box .row1 span{ font-size:11px; color:var(--muted); font-family:'JetBrains Mono'; }
@@ -95,8 +117,9 @@
   .amount-input{ background:transparent; border:none; color:var(--text); font-family:'JetBrains Mono'; font-size:23px; font-weight:500; width:100%; outline:none; }
   .amount-input::placeholder{ color:#454C5C; }
   .token-select{ display:flex; align-items:center; gap:7px; background:var(--bg); border:1px solid var(--line); border-radius:999px; padding:6px 12px 6px 6px; font-weight:600; font-size:14px; white-space:nowrap; flex-shrink:0; }
-  .token-select .dot{ width:22px; height:22px; border-radius:50%; flex-shrink:0; }
-  .token-select .dot.usdt{ background:linear-gradient(135deg,#26A17B,#1a7a5c); }
+  .token-select .dot{ width:22px; height:22px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .token-select .dot.usdt{ background:#26A17B; }
+  .token-select .dot.usdt svg{ width:14px; height:14px; }
   .token-select .dot.znz{ background:linear-gradient(135deg, var(--teal), var(--violet)); }
 
   .swap-divider{ display:flex; justify-content:center; margin:-10px 0; position:relative; z-index:3; transform:translateZ(28px); }
@@ -110,8 +133,10 @@
     width:100%; padding:16px; border-radius:13px; font-weight:700; font-size:15px; text-align:center;
     transform:translateZ(24px); transition:opacity 0.2s, transform 0.15s, box-shadow 0.2s;
   }
-  .primary-btn.pending{ background:var(--surface-2); color:var(--gold); border:1px dashed rgba(240,185,11,0.4); }
-  .primary-btn:hover{ box-shadow:0 14px 34px -14px rgba(240,185,11,0.35); }
+  .primary-btn.pending{ background:var(--surface-2); color:var(--gold); border:1px dashed rgba(240,185,11,0.4); animation:btn-pulse 2.4s ease-in-out infinite; }
+  @keyframes btn-pulse{ 0%,100%{ box-shadow:0 0 0 rgba(240,185,11,0); } 50%{ box-shadow:0 0 22px -4px rgba(240,185,11,0.35); } }
+  .primary-btn:hover{ box-shadow:0 14px 34px -14px rgba(240,185,11,0.5); transform:translateZ(24px) translateY(-2px); }
+  .primary-btn:active{ transform:translateZ(24px) translateY(0) scale(0.99); }
 
   footer{ position:relative; z-index:2; text-align:center; padding:16px 0 22px; }
   footer p{ color:var(--muted); font-size:10.5px; font-family:'JetBrains Mono'; letter-spacing:0.03em; }
@@ -144,13 +169,29 @@
 
     <div class="card-stage" id="tiltStage">
       <div class="card">
-        <div class="card-head"><h2>Swap</h2><div class="settings-icon">⚙</div></div>
+        <div class="card-head" style="position:relative">
+          <h2>Swap</h2>
+          <div class="settings-icon" id="settingsBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </div>
+          <div class="settings-panel" id="settingsPanel">
+            <div class="sp-label">SLIPPAGE TOLERANCE</div>
+            <div class="sp-options">
+              <button class="sp-opt" data-val="0.1">0.1%</button>
+              <button class="sp-opt active" data-val="0.5">0.5%</button>
+              <button class="sp-opt" data-val="1.0">1.0%</button>
+            </div>
+          </div>
+        </div>
 
         <div class="token-box">
           <div class="row1"><span>आप देंगे</span><span>Balance: 0.00</span></div>
           <div class="row2">
             <input type="text" class="amount-input mono" placeholder="0.0" inputmode="decimal">
-            <div class="token-select"><span class="dot usdt"></span>USDT</div>
+            <div class="token-select"><span class="dot usdt"><svg viewBox="0 0 32 32" fill="white"><path d="M17.9 17.4v-.01c-.11.01-.68.04-1.95.04-1.01 0-1.72-.03-1.97-.04v.01c-3.9-.17-6.81-.85-6.81-1.66s2.91-1.49 6.81-1.66v2.65c.25.02.98.06 1.99.06 1.21 0 1.82-.05 1.93-.06v-2.65c3.89.17 6.79.85 6.79 1.66s-2.9 1.48-6.79 1.66m0-3.59v-2.37h5.43V7.5H8.56v3.94h5.43v2.37c-4.41.2-7.73 1.07-7.73 2.12s3.32 1.91 7.73 2.12v7.59h3.91v-7.59c4.4-.2 7.72-1.07 7.72-2.12s-3.32-1.91-7.72-2.12"/></svg></span>USDT</div>
           </div>
         </div>
 
@@ -165,7 +206,7 @@
         </div>
 
         <div class="rate-line"><span>Rate</span><b>1 USDT = — ZNZ</b></div>
-        <div class="rate-line"><span>Slippage</span><b>0.5%</b></div>
+        <div class="rate-line"><span>Slippage</span><b id="slippageVal">0.5%</b></div>
 
         <button class="primary-btn pending" id="swapBtn">Connect Wallet to Swap</button>
       </div>
@@ -180,6 +221,30 @@
 (function(){
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var isMobile = window.innerWidth <= 640;
+
+  /* ---- settings panel (slippage) ---- */
+  const settingsBtn = document.getElementById('settingsBtn');
+  const settingsPanel = document.getElementById('settingsPanel');
+  const slippageVal = document.getElementById('slippageVal');
+
+  settingsBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    settingsBtn.classList.toggle('open');
+    settingsPanel.classList.toggle('show');
+  });
+  document.addEventListener('click', (e) => {
+    if(!settingsPanel.contains(e.target) && e.target !== settingsBtn){
+      settingsBtn.classList.remove('open');
+      settingsPanel.classList.remove('show');
+    }
+  });
+  document.querySelectorAll('.sp-opt').forEach(opt => {
+    opt.addEventListener('click', () => {
+      document.querySelectorAll('.sp-opt').forEach(o => o.classList.remove('active'));
+      opt.classList.add('active');
+      slippageVal.textContent = opt.dataset.val + '%';
+    });
+  });
 
   /* ---- Reown AppKit wallet connect ---- */
   const swapBtn = document.getElementById('swapBtn');
