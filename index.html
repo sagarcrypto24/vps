@@ -47,12 +47,7 @@
   .nav-inner{ max-width:520px; margin:0 auto; padding:14px 18px; display:flex; align-items:center; justify-content:space-between; }
   .brand{ display:flex; align-items:center; gap:9px; font-family:'Space Grotesk'; font-weight:700; font-size:18px; }
   .brand .mark{ width:24px; height:24px; border-radius:7px; background:linear-gradient(135deg, var(--teal), var(--violet)); flex-shrink:0; box-shadow:0 0 16px -2px rgba(45,212,191,0.6); }
-  #connectBtn{
-    background:linear-gradient(135deg, var(--teal), var(--violet)); color:#08110F; font-weight:700; font-size:12.5px;
-    padding:9px 15px; border-radius:9px; transition:transform 0.2s, box-shadow 0.2s;
-  }
-  #connectBtn:hover{ transform:translateY(-2px); box-shadow:0 10px 26px -10px rgba(45,212,191,0.55); }
-  #connectBtn.connected{ background:var(--surface-2); color:var(--teal); border:1px solid rgba(45,212,191,0.4); }
+  appkit-button{ --w3m-font-family:'Inter', sans-serif; }
 
   /* ---------- MAIN (swap at top, single page) ---------- */
   main{ flex:1; display:flex; align-items:flex-start; justify-content:center; padding:26px 16px 40px; position:relative; z-index:2; }
@@ -135,7 +130,7 @@
 <nav>
   <div class="nav-inner">
     <div class="brand"><span class="mark"></span>ZirakSwap</div>
-    <button id="connectBtn">Connect Wallet</button>
+    <appkit-button balance="hide" label="Connect Wallet"></appkit-button>
   </div>
 </nav>
 
@@ -186,24 +181,64 @@
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var isMobile = window.innerWidth <= 640;
 
-  /* ---- wallet connect (functional) ---- */
-  const connectBtn = document.getElementById('connectBtn');
+  /* ---- Reown AppKit wallet connect ---- */
   const swapBtn = document.getElementById('swapBtn');
   let walletAddress = null;
+  let appKitModal = null;
 
-  connectBtn.addEventListener('click', async () => {
-    if(typeof window.ethereum === 'undefined'){
-      alert('MetaMask या कोई Web3 wallet install नहीं मिला। कृपया MetaMask install करें।');
-      return;
-    }
+  // AppKit ko module ke roop me CDN se load karte hain
+  (async function initAppKit(){
     try{
-      const accounts = await window.ethereum.request({ method:'eth_requestAccounts' });
-      walletAddress = accounts[0];
-      connectBtn.textContent = walletAddress.slice(0,6) + '...' + walletAddress.slice(-4);
-      connectBtn.classList.add('connected');
-      swapBtn.textContent = 'Smart Contract जल्द जुड़ेगा';
-    }catch(err){ console.error('Wallet connect failed:', err); }
-  });
+      const { createAppKit, WagmiAdapter } = await import('https://cdn.jsdelivr.net/npm/@reown/appkit-cdn@latest/dist/appkit.js');
+
+      const projectId = '30c89e55db814cfd1d197f018b46d049';
+
+      // BNB Smart Chain network define kar rahe hain (PancakeSwap-style DEX ke liye)
+      const bsc = {
+        id: 56,
+        name: 'BNB Smart Chain',
+        nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+        rpcUrls: { default: { http: ['https://bsc-dataseed.binance.org'] } },
+        blockExplorers: { default: { name: 'BscScan', url: 'https://bscscan.com' } }
+      };
+
+      const wagmiAdapter = new WagmiAdapter({
+        networks: [bsc],
+        projectId
+      });
+
+      appKitModal = createAppKit({
+        adapters: [wagmiAdapter],
+        networks: [bsc],
+        projectId,
+        metadata: {
+          name: 'ZirakSwap',
+          description: 'ZirakSwap Decentralized Exchange',
+          url: 'http://88.222.245.113',
+          icons: ['https://avatars.githubusercontent.com/u/179229932']
+        },
+        themeMode: 'dark',
+        themeVariables: {
+          '--w3m-accent': '#2DD4BF',
+          '--w3m-border-radius-master': '2px'
+        },
+        features: { analytics: true, email: false, socials: [] }
+      });
+
+      // Wallet connect hone par address track karte hain
+      appKitModal.subscribeAccount((account) => {
+        if(account && account.isConnected && account.address){
+          walletAddress = account.address;
+          swapBtn.textContent = 'Smart Contract जल्द जुड़ेगा';
+        }else{
+          walletAddress = null;
+          swapBtn.textContent = 'Connect Wallet to Swap';
+        }
+      });
+    }catch(err){
+      console.error('Reown AppKit load nahi hua:', err);
+    }
+  })();
 
   /* =========================================================
      ★★★ SMART CONTRACT INTEGRATION POINT ★★★
@@ -216,7 +251,11 @@
   const ROUTER_ABI = [ /* TODO: paste Router ABI here */ ];
 
   swapBtn.addEventListener('click', () => {
-    if(!walletAddress){ alert('पहले wallet connect करें।'); return; }
+    if(!walletAddress){
+      if(appKitModal) appKitModal.open();
+      else alert('Wallet connect module अभी लोड हो रहा है, कुछ सेकंड बाद कोशिश करें।');
+      return;
+    }
     alert('Smart contract अभी जुड़ा नहीं है। Router address और ABI जोड़ने के बाद यहाँ से असली swap काम करेगा।');
     // TODO: ethers.js/web3.js से router.swapExactTokensForTokens() यहाँ कॉल होगा
   });
