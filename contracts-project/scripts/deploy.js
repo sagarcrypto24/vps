@@ -5,26 +5,21 @@ async function main() {
   console.log("Deploying with account:", deployer.address);
   console.log("Account balance:", (await hre.ethers.provider.getBalance(deployer.address)).toString());
 
-  const WBNB_ADDRESS = process.env.WBNB_ADDRESS;
-  if (!WBNB_ADDRESS) throw new Error("WBNB_ADDRESS .env me set nahi hai");
+  const USDT_ADDRESS = process.env.USDT_ADDRESS;
+  const SHIB_TOKEN_ADDRESS = process.env.SHIB_TOKEN_ADDRESS;
+  if (!USDT_ADDRESS) throw new Error("USDT_ADDRESS .env me set nahi hai");
+  if (!SHIB_TOKEN_ADDRESS) throw new Error("SHIB_TOKEN_ADDRESS .env me set nahi hai");
 
-  // 1) Factory deploy — feeToSetter = deployer (aap baad me protocol fee on/off kar sakte hain)
-  const Factory = await hre.ethers.getContractFactory("ZirakFactory");
-  const factory = await Factory.deploy(deployer.address);
-  await factory.waitForDeployment();
-  console.log("ZirakFactory deployed:", await factory.getAddress());
-
-  // 2) Router deploy — factory + WBNB address lega
-  const Router = await hre.ethers.getContractFactory("ZirakRouter");
-  const router = await Router.deploy(await factory.getAddress(), WBNB_ADDRESS);
-  await router.waitForDeployment();
-  console.log("ZirakRouter deployed:", await router.getAddress());
+  // Sirf ek hi contract deploy hoga — fixed USDT/SHIB pool
+  const ZirakSwap = await hre.ethers.getContractFactory("ZirakSwap");
+  const zirakSwap = await ZirakSwap.deploy(USDT_ADDRESS, SHIB_TOKEN_ADDRESS);
+  await zirakSwap.waitForDeployment();
 
   console.log("\n===============================================");
-  console.log("Deployment complete! Ye addresses frontend me daalen:");
-  console.log("Factory:", await factory.getAddress());
-  console.log("Router: ", await router.getAddress());
-  console.log("WBNB:   ", WBNB_ADDRESS);
+  console.log("Deployment complete!");
+  console.log("ZirakSwap contract:", await zirakSwap.getAddress());
+  console.log("USDT:", USDT_ADDRESS);
+  console.log("SHIB:", SHIB_TOKEN_ADDRESS);
   console.log("===============================================\n");
 }
 
@@ -32,3 +27,4 @@ main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
+
