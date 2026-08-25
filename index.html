@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>ZirakSwap — Decentralized Exchange</title>
+<title>ZirakSwap — Swap</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
@@ -16,341 +16,278 @@
     --teal: #2DD4BF;
     --violet: #8B5CF6;
     --gold: #F0B90B;
-    --danger: #F0554A;
     --line: rgba(255,255,255,0.09);
   }
 
   *{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{ height:100%; }
   body{
-    background:
-      radial-gradient(1200px 600px at 15% -10%, rgba(45,212,191,0.08), transparent 60%),
-      radial-gradient(1000px 500px at 100% 10%, rgba(139,92,246,0.08), transparent 60%),
-      var(--bg);
-    color:var(--text); font-family:'Inter', sans-serif; min-height:100vh; overflow-x:hidden;
+    background:var(--bg); color:var(--text); font-family:'Inter', sans-serif;
+    min-height:100svh; overflow-x:hidden; display:flex; flex-direction:column;
   }
   h1,h2,h3{ font-family:'Space Grotesk', sans-serif; }
   .mono{ font-family:'JetBrains Mono', monospace; }
-  a{ color:inherit; text-decoration:none; }
   button{ font-family:inherit; cursor:pointer; border:none; }
 
   @media (prefers-reduced-motion: reduce){
     *{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; }
   }
 
-  .wrap{ max-width:1180px; margin:0 auto; padding:0 20px; }
+  /* ---------- animated background layers ---------- */
+  #bg-canvas{ position:fixed; inset:0; z-index:0; pointer-events:none; opacity:0.85; }
+  .bg-glow{ position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(700px 500px at 18% 8%, rgba(45,212,191,0.14), transparent 60%),
+      radial-gradient(650px 450px at 88% 18%, rgba(139,92,246,0.14), transparent 60%),
+      radial-gradient(600px 500px at 50% 100%, rgba(240,185,11,0.06), transparent 60%);
+  }
 
   /* ---------- NAV ---------- */
-  nav{ position:sticky; top:0; z-index:100; background:rgba(11,14,20,0.85); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); }
-  .nav-inner{ max-width:1180px; margin:0 auto; padding:14px 20px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
-  .brand{ display:flex; align-items:center; gap:9px; font-family:'Space Grotesk'; font-weight:700; font-size:19px; }
-  .brand .mark{ width:26px; height:26px; border-radius:8px; background:linear-gradient(135deg, var(--teal), var(--violet)); flex-shrink:0; }
-  .tabs{ display:flex; gap:4px; background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:4px; }
-  .tab-btn{ background:transparent; color:var(--muted); font-weight:600; font-size:13.5px; padding:8px 16px; border-radius:7px; transition:all 0.2s; }
-  .tab-btn.active{ background:var(--surface-2); color:var(--text); }
-  .tab-btn:hover:not(.active){ color:var(--text); }
+  nav{ position:sticky; top:0; z-index:100; background:rgba(11,14,20,0.7); backdrop-filter:blur(14px); border-bottom:1px solid var(--line); }
+  .nav-inner{ max-width:520px; margin:0 auto; padding:14px 18px; display:flex; align-items:center; justify-content:space-between; }
+  .brand{ display:flex; align-items:center; gap:9px; font-family:'Space Grotesk'; font-weight:700; font-size:18px; }
+  .brand .mark{ width:24px; height:24px; border-radius:7px; background:linear-gradient(135deg, var(--teal), var(--violet)); flex-shrink:0; box-shadow:0 0 16px -2px rgba(45,212,191,0.6); }
   #connectBtn{
-    background:linear-gradient(135deg, var(--teal), var(--violet)); color:#08110F; font-weight:700; font-size:13.5px;
-    padding:10px 18px; border-radius:9px; transition:transform 0.2s, box-shadow 0.2s;
+    background:linear-gradient(135deg, var(--teal), var(--violet)); color:#08110F; font-weight:700; font-size:12.5px;
+    padding:9px 15px; border-radius:9px; transition:transform 0.2s, box-shadow 0.2s;
   }
-  #connectBtn:hover{ transform:translateY(-2px); box-shadow:0 10px 26px -10px rgba(45,212,191,0.5); }
+  #connectBtn:hover{ transform:translateY(-2px); box-shadow:0 10px 26px -10px rgba(45,212,191,0.55); }
   #connectBtn.connected{ background:var(--surface-2); color:var(--teal); border:1px solid rgba(45,212,191,0.4); }
-  @media (max-width:760px){ .tabs{ order:3; width:100%; justify-content:center; } .nav-inner{ flex-wrap:wrap; } }
 
-  /* ---------- HERO / SIGNATURE POOL VISUAL ---------- */
-  .hero{ padding:56px 0 30px; text-align:center; position:relative; }
-  .hero .kicker{ font-family:'JetBrains Mono'; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--teal); margin-bottom:14px; display:inline-block; }
-  .hero h1{ font-size:clamp(30px,5vw,46px); font-weight:700; line-height:1.1; margin-bottom:14px; }
-  .hero h1 span{ background:linear-gradient(90deg, var(--teal), var(--violet)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
-  .hero p{ color:var(--muted); max-width:480px; margin:0 auto 34px; font-size:15px; }
+  /* ---------- MAIN (swap at top, single page) ---------- */
+  main{ flex:1; display:flex; align-items:flex-start; justify-content:center; padding:26px 16px 40px; position:relative; z-index:2; }
+  .swap-wrap{ width:100%; max-width:420px; perspective:1200px; }
 
-  .pool-viz{ position:relative; width:100%; max-width:340px; height:120px; margin:0 auto 10px; }
+  .pool-viz{ position:relative; width:100%; max-width:220px; height:70px; margin:0 auto 16px; }
   .pool-orb{
-    position:absolute; top:50%; width:78px; height:78px; border-radius:50%;
-    display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono'; font-weight:700; font-size:14px;
-    box-shadow:0 0 40px -6px currentColor;
+    position:absolute; top:50%; width:46px; height:46px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono'; font-weight:700; font-size:9px;
+    box-shadow:0 0 30px -4px currentColor; animation:orbit 4.5s ease-in-out infinite;
   }
-  .pool-orb.a{ left:20%; transform:translate(-50%,-50%); background:radial-gradient(circle at 35% 30%, #4EE8D4, var(--teal)); color:var(--teal); }
-  .pool-orb.b{ left:80%; transform:translate(-50%,-50%); background:radial-gradient(circle at 35% 30%, #B79CFF, var(--violet)); color:var(--violet); }
+  .pool-orb.a{ left:22%; transform:translate(-50%,-50%); background:radial-gradient(circle at 35% 30%, #4EE8D4, var(--teal)); color:var(--teal); animation-delay:0s; }
+  .pool-orb.b{ left:78%; transform:translate(-50%,-50%); background:radial-gradient(circle at 35% 30%, #B79CFF, var(--violet)); color:var(--violet); animation-delay:-2.25s; }
   .pool-orb span{ color:#081014; }
-  .pool-flow{ position:absolute; top:50%; left:20%; right:20%; height:2px; transform:translateY(-50%); overflow:hidden; }
-  .pool-flow::before{
-    content:''; position:absolute; inset:0;
-    background:linear-gradient(90deg, var(--teal), var(--violet), var(--teal));
-    background-size:200% 100%; animation:flow 3s linear infinite;
-  }
+  .pool-flow{ position:absolute; top:50%; left:22%; right:22%; height:2px; transform:translateY(-50%); overflow:hidden; border-radius:2px; }
+  .pool-flow::before{ content:''; position:absolute; inset:0; background:linear-gradient(90deg, var(--teal), var(--violet), var(--teal)); background-size:200% 100%; animation:flow 3s linear infinite; }
   @keyframes flow{ to{ background-position:-200% 0; } }
-  .pool-orb{ animation:orbit 4.5s ease-in-out infinite; }
-  .pool-orb.a{ animation-delay:0s; }
-  .pool-orb.b{ animation-delay:-2.25s; }
-  @keyframes orbit{ 0%,100%{ transform:translate(-50%,-50%) scale(1); } 50%{ transform:translate(-50%,-56%) scale(1.06); } }
+  @keyframes orbit{ 0%,100%{ transform:translate(-50%,-50%) scale(1); } 50%{ transform:translate(-50%,-58%) scale(1.08); } }
 
-  /* ---------- LAYOUT ---------- */
-  .main-grid{ display:grid; grid-template-columns:1fr; gap:20px; padding-bottom:60px; }
-  .center-col{ max-width:460px; margin:0 auto; width:100%; }
+  /* ---------- 3D SWAP CARD ---------- */
+  .card-stage{ transform-style:preserve-3d; transition:transform 0.12s ease-out; }
+  .card{
+    position:relative; background:rgba(19,23,32,0.75); backdrop-filter:blur(18px);
+    border-radius:20px; padding:20px; isolation:isolate;
+    box-shadow:0 30px 70px -25px rgba(0,0,0,0.7);
+  }
+  .card::before{
+    content:''; position:absolute; inset:0; border-radius:20px; padding:1.5px;
+    background:conic-gradient(from var(--ang,0deg), transparent 0 70%, var(--teal) 82%, var(--violet) 92%, transparent 100%);
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude; animation:chase 5s linear infinite; z-index:-1;
+  }
+  @keyframes chase{ to{ --ang:360deg; } }
+  @property --ang{ syntax:'<angle>'; inherits:false; initial-value:0deg; }
 
-  /* ---------- SWAP CARD ---------- */
-  .card{ background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:18px; }
-  .card-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
-  .card-head h2{ font-size:17px; font-weight:600; }
+  .card-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; transform:translateZ(24px); }
+  .card-head h2{ font-size:18px; font-weight:700; }
   .settings-icon{ width:32px; height:32px; border-radius:8px; background:var(--surface-2); display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:14px; }
 
-  .token-box{ background:var(--surface-2); border:1px solid transparent; border-radius:12px; padding:14px; transition:border-color 0.2s; }
-  .token-box:focus-within{ border-color:rgba(45,212,191,0.4); }
-  .token-box .row1{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
-  .token-box .row1 span{ font-size:11.5px; color:var(--muted); font-family:'JetBrains Mono'; }
+  .token-box{ background:var(--surface-2); border:1px solid transparent; border-radius:14px; padding:15px; transition:border-color 0.2s, box-shadow 0.2s; transform:translateZ(20px); }
+  .token-box:focus-within{ border-color:rgba(45,212,191,0.45); box-shadow:0 0 0 3px rgba(45,212,191,0.1); }
+  .token-box .row1{ display:flex; justify-content:space-between; align-items:center; margin-bottom:9px; }
+  .token-box .row1 span{ font-size:11px; color:var(--muted); font-family:'JetBrains Mono'; }
   .token-box .row2{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
-  .amount-input{
-    background:transparent; border:none; color:var(--text); font-family:'JetBrains Mono'; font-size:22px; font-weight:500;
-    width:100%; outline:none;
-  }
+  .amount-input{ background:transparent; border:none; color:var(--text); font-family:'JetBrains Mono'; font-size:23px; font-weight:500; width:100%; outline:none; }
   .amount-input::placeholder{ color:#454C5C; }
-  .token-select{
-    display:flex; align-items:center; gap:7px; background:var(--surface); border:1px solid var(--line); border-radius:999px;
-    padding:6px 12px 6px 6px; font-weight:600; font-size:14px; white-space:nowrap; flex-shrink:0;
-  }
+  .token-select{ display:flex; align-items:center; gap:7px; background:var(--bg); border:1px solid var(--line); border-radius:999px; padding:6px 12px 6px 6px; font-weight:600; font-size:14px; white-space:nowrap; flex-shrink:0; }
   .token-select .dot{ width:22px; height:22px; border-radius:50%; flex-shrink:0; }
   .token-select .dot.usdt{ background:linear-gradient(135deg,#26A17B,#1a7a5c); }
   .token-select .dot.znz{ background:linear-gradient(135deg, var(--teal), var(--violet)); }
 
-  .swap-divider{ display:flex; justify-content:center; margin:-8px 0; position:relative; z-index:2; }
-  .swap-flip{
-    width:34px; height:34px; border-radius:10px; background:var(--surface); border:3px solid var(--bg);
-    display:flex; align-items:center; justify-content:center; color:var(--teal); font-size:14px; transition:transform 0.3s;
-  }
+  .swap-divider{ display:flex; justify-content:center; margin:-10px 0; position:relative; z-index:3; transform:translateZ(28px); }
+  .swap-flip{ width:36px; height:36px; border-radius:11px; background:var(--surface); border:3px solid var(--surface); box-shadow:0 0 0 3px var(--surface), 0 6px 18px -6px rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; color:var(--teal); font-size:15px; transition:transform 0.3s; }
   .swap-flip:hover{ transform:rotate(180deg); }
 
-  .rate-line{ display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin:14px 0; font-family:'JetBrains Mono'; }
+  .rate-line{ display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin:14px 0; font-family:'JetBrains Mono'; transform:translateZ(18px); }
   .rate-line b{ color:var(--text); font-weight:500; }
 
   .primary-btn{
-    width:100%; padding:15px; border-radius:12px; font-weight:700; font-size:15px; text-align:center;
-    background:linear-gradient(135deg, var(--teal), var(--violet)); color:#081014; transition:opacity 0.2s, transform 0.15s;
+    width:100%; padding:16px; border-radius:13px; font-weight:700; font-size:15px; text-align:center;
+    transform:translateZ(24px); transition:opacity 0.2s, transform 0.15s, box-shadow 0.2s;
   }
-  .primary-btn:hover{ opacity:0.92; transform:translateY(-1px); }
-  .primary-btn:disabled{ background:var(--surface-2); color:var(--muted); cursor:not-allowed; transform:none; }
   .primary-btn.pending{ background:var(--surface-2); color:var(--gold); border:1px dashed rgba(240,185,11,0.4); }
+  .primary-btn:hover{ box-shadow:0 14px 34px -14px rgba(240,185,11,0.35); }
 
-  /* ---------- LIQUIDITY / FARMS SHARED ---------- */
-  .lp-row, .farm-row{
-    display:flex; align-items:center; justify-content:space-between; padding:14px; background:var(--surface-2);
-    border-radius:12px; margin-bottom:10px; border:1px solid transparent; transition:border-color 0.2s;
+  footer{ position:relative; z-index:2; text-align:center; padding:16px 0 22px; }
+  footer p{ color:var(--muted); font-size:10.5px; font-family:'JetBrains Mono'; letter-spacing:0.03em; }
+
+  @media (max-width:420px){
+    .card{ padding:16px; border-radius:16px; }
+    .amount-input{ font-size:20px; }
   }
-  .lp-row:hover, .farm-row:hover{ border-color:rgba(139,92,246,0.3); }
-  .lp-pair{ display:flex; align-items:center; gap:10px; }
-  .lp-icons{ display:flex; }
-  .lp-icons .dot{ width:26px; height:26px; border-radius:50%; border:2px solid var(--surface-2); }
-  .lp-icons .dot:nth-child(2){ margin-left:-10px; }
-  .lp-name{ font-weight:600; font-size:14px; }
-  .lp-sub{ font-size:11px; color:var(--muted); font-family:'JetBrains Mono'; }
-  .apr-tag{ font-family:'JetBrains Mono'; font-size:12px; color:var(--teal); background:rgba(45,212,191,0.12); padding:5px 10px; border-radius:999px; }
-  .small-btn{ background:var(--surface); border:1px solid var(--line); color:var(--text); font-weight:600; font-size:12.5px; padding:8px 14px; border-radius:8px; }
-  .small-btn:hover{ border-color:var(--teal); color:var(--teal); }
-
-  .empty-note{ text-align:center; color:var(--muted); font-size:13px; padding:20px 0; }
-
-  /* ---------- STATUS / BLUEPRINT PANEL ---------- */
-  .status-section{ padding:20px 0 70px; }
-  .status-head{ text-align:center; margin-bottom:30px; }
-  .status-head .kicker{ font-family:'JetBrains Mono'; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--violet); }
-  .status-head h2{ font-size:clamp(24px,3.5vw,32px); margin-top:10px; }
-  .status-head p{ color:var(--muted); font-size:14px; margin-top:10px; max-width:520px; margin-left:auto; margin-right:auto; }
-
-  .status-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(240px,1fr)); gap:12px; max-width:900px; margin:0 auto; }
-  .status-card{ background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:18px; }
-  .status-card .s-top{ display:flex; align-items:center; gap:10px; margin-bottom:10px; }
-  .status-dot{ width:9px; height:9px; border-radius:50%; flex-shrink:0; }
-  .status-dot.live{ background:var(--teal); box-shadow:0 0 8px var(--teal); }
-  .status-dot.pending{ background:var(--gold); box-shadow:0 0 8px var(--gold); animation:pulse-dot 1.5s infinite; }
-  @keyframes pulse-dot{ 0%,100%{opacity:1;} 50%{opacity:0.3;} }
-  .status-card h3{ font-size:15px; font-weight:600; }
-  .status-tag{ font-family:'JetBrains Mono'; font-size:10.5px; margin-left:auto; padding:3px 8px; border-radius:999px; }
-  .status-tag.live{ color:var(--teal); background:rgba(45,212,191,0.12); }
-  .status-tag.pending{ color:var(--gold); background:rgba(240,185,11,0.12); }
-  .status-card p{ color:var(--muted); font-size:12.5px; line-height:1.55; }
-
-  footer{ border-top:1px solid var(--line); padding:24px 0; text-align:center; }
-  footer p{ color:var(--muted); font-size:12px; font-family:'JetBrains Mono'; }
 </style>
 </head>
 <body>
 
+<canvas id="bg-canvas"></canvas>
+<div class="bg-glow"></div>
+
 <nav>
   <div class="nav-inner">
     <div class="brand"><span class="mark"></span>ZirakSwap</div>
-    <div class="tabs">
-      <button class="tab-btn active" data-tab="swap">Swap</button>
-      <button class="tab-btn" data-tab="liquidity">Liquidity</button>
-      <button class="tab-btn" data-tab="farms">Farms</button>
-    </div>
     <button id="connectBtn">Connect Wallet</button>
   </div>
 </nav>
 
-<header class="hero">
-  <div class="wrap">
-    <span class="kicker">// BLUEPRINT — SMART CONTRACT आने वाला है</span>
-    <h1>अपने टोकन <span>Swap</span> करें, बिना किसी बिचौलिए के</h1>
-    <p>ये UI ढांचा तैयार है — swap, liquidity और farming, सब आपस में जुड़े हुए। असली token transfer तब शुरू होगा जब स्मार्ट कॉन्ट्रैक्ट कनेक्ट होगा।</p>
+<main>
+  <div class="swap-wrap">
     <div class="pool-viz">
       <div class="pool-flow"></div>
       <div class="pool-orb a"><span>USDT</span></div>
       <div class="pool-orb b"><span>ZNZ</span></div>
     </div>
-  </div>
-</header>
 
-<main class="wrap main-grid">
-  <div class="center-col">
+    <div class="card-stage" id="tiltStage">
+      <div class="card">
+        <div class="card-head"><h2>Swap</h2><div class="settings-icon">⚙</div></div>
 
-    <!-- ===== SWAP TAB ===== -->
-    <section id="tab-swap" class="card">
-      <div class="card-head"><h2>Swap</h2><div class="settings-icon">⚙</div></div>
-
-      <div class="token-box">
-        <div class="row1"><span>आप देंगे</span><span>Balance: 0.00</span></div>
-        <div class="row2">
-          <input type="text" class="amount-input mono" placeholder="0.0" inputmode="decimal">
-          <div class="token-select"><span class="dot usdt"></span>USDT</div>
+        <div class="token-box">
+          <div class="row1"><span>आप देंगे</span><span>Balance: 0.00</span></div>
+          <div class="row2">
+            <input type="text" class="amount-input mono" placeholder="0.0" inputmode="decimal">
+            <div class="token-select"><span class="dot usdt"></span>USDT</div>
+          </div>
         </div>
-      </div>
 
-      <div class="swap-divider"><div class="swap-flip">⇅</div></div>
+        <div class="swap-divider"><div class="swap-flip">⇅</div></div>
 
-      <div class="token-box">
-        <div class="row1"><span>आपको मिलेगा (अनुमानित)</span><span>Balance: 0.00</span></div>
-        <div class="row2">
-          <input type="text" class="amount-input mono" placeholder="0.0" inputmode="decimal" disabled>
-          <div class="token-select"><span class="dot znz"></span>ZNZ</div>
+        <div class="token-box">
+          <div class="row1"><span>आपको मिलेगा</span><span>Balance: 0.00</span></div>
+          <div class="row2">
+            <input type="text" class="amount-input mono" placeholder="0.0" inputmode="decimal" disabled>
+            <div class="token-select"><span class="dot znz"></span>ZNZ</div>
+          </div>
         </div>
+
+        <div class="rate-line"><span>Rate</span><b>1 USDT = — ZNZ</b></div>
+        <div class="rate-line"><span>Slippage</span><b>0.5%</b></div>
+
+        <button class="primary-btn pending" id="swapBtn">Connect Wallet to Swap</button>
       </div>
-
-      <div class="rate-line">
-        <span>Rate</span>
-        <b>1 USDT = — ZNZ <span style="color:var(--gold)">(contract pending)</span></b>
-      </div>
-      <div class="rate-line">
-        <span>Slippage Tolerance</span>
-        <b>0.5%</b>
-      </div>
-
-      <button class="primary-btn pending" id="swapBtn">Smart Contract जल्द जुड़ेगा</button>
-    </section>
-
-    <!-- ===== LIQUIDITY TAB ===== -->
-    <section id="tab-liquidity" class="card" style="display:none">
-      <div class="card-head"><h2>Liquidity Pools</h2><button class="small-btn">+ Add Liquidity</button></div>
-
-      <div class="lp-row">
-        <div class="lp-pair">
-          <div class="lp-icons"><span class="dot usdt" style="width:26px;height:26px;display:inline-block;border-radius:50%;background:linear-gradient(135deg,#26A17B,#1a7a5c);border:2px solid var(--surface-2);"></span><span class="dot znz" style="width:26px;height:26px;display:inline-block;border-radius:50%;background:linear-gradient(135deg, var(--teal), var(--violet));border:2px solid var(--surface-2);margin-left:-10px;"></span></div>
-          <div><div class="lp-name">USDT / ZNZ</div><div class="lp-sub">Pool ID: pending</div></div>
-        </div>
-        <span class="apr-tag">APR: —</span>
-      </div>
-
-      <p class="empty-note">Liquidity pools contract deploy होने के बाद यहाँ live TVL और आपकी LP position दिखेगी।</p>
-    </section>
-
-    <!-- ===== FARMS TAB ===== -->
-    <section id="tab-farms" class="card" style="display:none">
-      <div class="card-head"><h2>Yield Farms</h2></div>
-
-      <div class="farm-row">
-        <div class="lp-pair">
-          <div class="lp-icons"><span style="width:26px;height:26px;display:inline-block;border-radius:50%;background:linear-gradient(135deg,#26A17B,#1a7a5c);border:2px solid var(--surface-2);"></span><span style="width:26px;height:26px;display:inline-block;border-radius:50%;background:linear-gradient(135deg, var(--teal), var(--violet));border:2px solid var(--surface-2);margin-left:-10px;"></span></div>
-          <div><div class="lp-name">USDT-ZNZ LP</div><div class="lp-sub">Reward: ZNZ token</div></div>
-        </div>
-        <span class="apr-tag">APR: —</span>
-      </div>
-
-      <p class="empty-note">Farm staking contract जुड़ते ही यहाँ से LP tokens stake करके reward कमाना शुरू कर सकेंगे।</p>
-    </section>
-
+    </div>
   </div>
 </main>
 
-<section class="status-section">
-  <div class="wrap">
-    <div class="status-head">
-      <span class="kicker">// PROJECT STATUS</span>
-      <h2>Blueprint का हाल — क्या live है, क्या बाकी है</h2>
-      <p>ये पूरा DEX अभी frontend blueprint है। हर हिस्सा दिखने में तैयार है, असली fund movement smart contract जुड़ने के बाद ही शुरू होगा।</p>
-    </div>
-    <div class="status-grid">
-      <div class="status-card"><div class="s-top"><span class="status-dot live"></span><h3>Wallet Connect</h3><span class="status-tag live">LIVE</span></div><p>MetaMask/Web3 wallet से जुड़ना अभी से काम करता है — असली functional कोड।</p></div>
-      <div class="status-card"><div class="s-top"><span class="status-dot pending"></span><h3>Swap Execution</h3><span class="status-tag pending">PENDING</span></div><p>Router contract address और ABI जोड़ने के बाद असली token swap शुरू होगा।</p></div>
-      <div class="status-card"><div class="s-top"><span class="status-dot pending"></span><h3>Liquidity Pools</h3><span class="status-tag pending">PENDING</span></div><p>Factory/Pair contracts deploy होने के बाद pool creation और LP tracking जुड़ेगी।</p></div>
-      <div class="status-card"><div class="s-top"><span class="status-dot pending"></span><h3>Farming / Staking</h3><span class="status-tag pending">PENDING</span></div><p>MasterChef-स्टाइल staking contract जुड़ने के बाद reward distribution शुरू होगी।</p></div>
-      <div class="status-card"><div class="s-top"><span class="status-dot pending"></span><h3>Price Feed / Charts</h3><span class="status-tag pending">PENDING</span></div><p>On-chain data आने के बाद real-time price aur chart यहाँ जुड़ेगा।</p></div>
-      <div class="status-card"><div class="s-top"><span class="status-dot live"></span><h3>UI / UX Structure</h3><span class="status-tag live">LIVE</span></div><p>Swap, Liquidity, Farms — तीनों tabs का पूरा ढांचा तैयार है।</p></div>
-    </div>
-  </div>
-</section>
+<footer><p>ZIRAKSWAP · POWERED BY BLOCKCHAIN</p></footer>
 
-<footer><p>ZIRAKSWAP · BLUEPRINT BUILD · SMART CONTRACT INTEGRATION PENDING</p></footer>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-/* =========================================================
-   WALLET CONNECT — यह हिस्सा असली/functional है (MetaMask)
-   ========================================================= */
-const connectBtn = document.getElementById('connectBtn');
-let walletAddress = null;
+(function(){
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var isMobile = window.innerWidth <= 640;
 
-connectBtn.addEventListener('click', async () => {
-  if(typeof window.ethereum === 'undefined'){
-    alert('MetaMask या कोई Web3 wallet install नहीं मिला। कृपया MetaMask install करें।');
-    return;
-  }
-  try{
-    const accounts = await window.ethereum.request({ method:'eth_requestAccounts' });
-    walletAddress = accounts[0];
-    connectBtn.textContent = walletAddress.slice(0,6) + '...' + walletAddress.slice(-4);
-    connectBtn.classList.add('connected');
-  }catch(err){
-    console.error('Wallet connect failed:', err);
-  }
-});
+  /* ---- wallet connect (functional) ---- */
+  const connectBtn = document.getElementById('connectBtn');
+  const swapBtn = document.getElementById('swapBtn');
+  let walletAddress = null;
 
-/* =========================================================
-   TAB SWITCHING
-   ========================================================= */
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const target = btn.dataset.tab;
-    ['swap','liquidity','farms'].forEach(t => {
-      document.getElementById('tab-' + t).style.display = (t === target) ? 'block' : 'none';
-    });
+  connectBtn.addEventListener('click', async () => {
+    if(typeof window.ethereum === 'undefined'){
+      alert('MetaMask या कोई Web3 wallet install नहीं मिला। कृपया MetaMask install करें।');
+      return;
+    }
+    try{
+      const accounts = await window.ethereum.request({ method:'eth_requestAccounts' });
+      walletAddress = accounts[0];
+      connectBtn.textContent = walletAddress.slice(0,6) + '...' + walletAddress.slice(-4);
+      connectBtn.classList.add('connected');
+      swapBtn.textContent = 'Smart Contract जल्द जुड़ेगा';
+    }catch(err){ console.error('Wallet connect failed:', err); }
   });
-});
 
-/* =========================================================
-   ★★★ SMART CONTRACT INTEGRATION POINT ★★★
-   यहाँ बाद में असली router/factory/staking contract जोड़ना है।
-   जब contract तैयार हो जाए, नीचे दिए गए placeholders भरें:
-   ========================================================= */
+  /* =========================================================
+     ★★★ SMART CONTRACT INTEGRATION POINT ★★★
+     Deploy होने के बाद यहाँ router/factory address + ABI डालें
+     ========================================================= */
+  const CONTRACT_ADDRESSES = {
+    router:  "0x0000000000000000000000000000000000000000",
+    factory: "0x0000000000000000000000000000000000000000"
+  };
+  const ROUTER_ABI = [ /* TODO: paste Router ABI here */ ];
 
-// 1) Contract addresses (deploy होने के बाद यहाँ डालें)
-const CONTRACT_ADDRESSES = {
-  router:  "0x0000000000000000000000000000000000000000", // PancakeSwap-style Router
-  factory: "0x0000000000000000000000000000000000000000", // Pair Factory
-  masterChef: "0x0000000000000000000000000000000000000000" // Farming/Staking contract
-};
+  swapBtn.addEventListener('click', () => {
+    if(!walletAddress){ alert('पहले wallet connect करें।'); return; }
+    alert('Smart contract अभी जुड़ा नहीं है। Router address और ABI जोड़ने के बाद यहाँ से असली swap काम करेगा।');
+    // TODO: ethers.js/web3.js से router.swapExactTokensForTokens() यहाँ कॉल होगा
+  });
 
-// 2) ABI (contract compile करने के बाद यहाँ paste करें)
-const ROUTER_ABI = [ /* TODO: paste Router ABI here */ ];
-const FACTORY_ABI = [ /* TODO: paste Factory ABI here */ ];
-
-// 3) Swap function — अभी सिर्फ placeholder alert दिखाता है
-document.getElementById('swapBtn').addEventListener('click', () => {
-  if(!walletAddress){
-    alert('पहले wallet connect करें।');
-    return;
+  /* ---- 3D tilt on swap card (desktop only) ---- */
+  var stage = document.getElementById('tiltStage');
+  if(stage && !reduced && !isMobile){
+    stage.addEventListener('mousemove', function(e){
+      var r = stage.getBoundingClientRect();
+      var x = (e.clientX - r.left) / r.width - 0.5;
+      var y = (e.clientY - r.top) / r.height - 0.5;
+      stage.style.transform = 'rotateY(' + (x*10) + 'deg) rotateX(' + (-y*10) + 'deg)';
+    });
+    stage.addEventListener('mouseleave', function(){ stage.style.transform = 'rotateY(0deg) rotateX(0deg)'; });
   }
-  alert('Smart contract अभी जुड़ा नहीं है। Router contract address और ABI जोड़ने के बाद यहाँ से असली swap काम करेगा।');
-  // TODO: यहाँ ethers.js/web3.js से router.swapExactTokensForTokens() जैसा असली call आएगा
-});
+
+  /* ---- floating particle background (skip on mobile for performance) ---- */
+  var canvas = document.getElementById('bg-canvas');
+  if(canvas && window.THREE && !reduced && !isMobile){
+    var w = window.innerWidth, h = window.innerHeight;
+    var renderer = new THREE.WebGLRenderer({ canvas:canvas, alpha:true, antialias:true });
+    renderer.setSize(w, h);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(45, w/h, 0.1, 100);
+    camera.position.set(0, 0, 14);
+
+    var group = new THREE.Group();
+    scene.add(group);
+
+    var geo = new THREE.BufferGeometry();
+    var count = 90;
+    var positions = new Float32Array(count*3);
+    for(var i=0;i<count;i++){
+      positions[i*3] = (Math.random()-0.5)*22;
+      positions[i*3+1] = (Math.random()-0.5)*14;
+      positions[i*3+2] = (Math.random()-0.5)*10 - 4;
+    }
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    var mat = new THREE.PointsMaterial({ color:0x2DD4BF, size:0.045, transparent:true, opacity:0.55 });
+    var points = new THREE.Points(geo, mat);
+    group.add(points);
+
+    var mat2 = new THREE.PointsMaterial({ color:0x8B5CF6, size:0.04, transparent:true, opacity:0.45 });
+    var points2 = new THREE.Points(geo.clone(), mat2);
+    points2.rotation.z = 0.6;
+    group.add(points2);
+
+    var mouseX=0, mouseY=0;
+    window.addEventListener('mousemove', function(e){
+      mouseX = (e.clientX/window.innerWidth)-0.5;
+      mouseY = (e.clientY/window.innerHeight)-0.5;
+    });
+
+    function animate(){
+      requestAnimationFrame(animate);
+      group.rotation.y += 0.0006;
+      group.rotation.x += (-mouseY*0.15 - group.rotation.x)*0.02;
+      group.rotation.y += (mouseX*0.1 - group.rotation.y)*0.001;
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', function(){
+      var nw = window.innerWidth, nh = window.innerHeight;
+      camera.aspect = nw/nh; camera.updateProjectionMatrix();
+      renderer.setSize(nw, nh);
+    });
+  }
+})();
 </script>
 
 </body>
