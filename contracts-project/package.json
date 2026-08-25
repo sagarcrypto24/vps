@@ -1,0 +1,17 @@
+{
+  "name": "zirakswap-contracts",
+  "version": "1.0.0",
+  "description": "ZirakSwap AMM DEX smart contracts (Factory + Pair + Router) for BNB Smart Chain",
+  "scripts": {
+    "compile": "hardhat compile",
+    "deploy:testnet": "hardhat run scripts/deploy.js --network bscTestnet",
+    "deploy:mainnet": "hardhat run scripts/deploy.js --network bscMainnet",
+    "verify:testnet": "hardhat verify --network bscTestnet",
+    "verify:mainnet": "hardhat verify --network bscMainnet"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "hardhat": "^2.20.0",
+    "dotenv": "^16.4.0"
+  }
+}
