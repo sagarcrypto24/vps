@@ -3,544 +3,354 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>StreamForge — अपना Netflix जैसा ऐप बनवाएं</title>
+<title>ZirakSwap — Decentralized Exchange</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
   :root{
-    --bg: #0A0A0A;
-    --bg-soft: #141414;
-    --surface: #181818;
-    --surface-2: #222222;
-    --text: #FFFFFF;
-    --muted: #CFCFCF;
-    --red: #E50914;
-    --red-bright: #F6121D;
-    --red-deep: #6E0A0F;
+    --bg: #0B0E14;
+    --surface: #131720;
+    --surface-2: #1B212C;
+    --text: #EDEFF4;
+    --muted: #8A93A6;
+    --teal: #2DD4BF;
+    --violet: #8B5CF6;
+    --gold: #F0B90B;
+    --danger: #F0554A;
     --line: rgba(255,255,255,0.09);
   }
 
   *{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  html{ scroll-behavior:smooth; }
   body{
-    background:var(--bg); color:var(--text); font-family:'Inter', sans-serif;
-    line-height:1.65; overflow-x:hidden; font-weight:500;
+    background:
+      radial-gradient(1200px 600px at 15% -10%, rgba(45,212,191,0.08), transparent 60%),
+      radial-gradient(1000px 500px at 100% 10%, rgba(139,92,246,0.08), transparent 60%),
+      var(--bg);
+    color:var(--text); font-family:'Inter', sans-serif; min-height:100vh; overflow-x:hidden;
   }
+  h1,h2,h3{ font-family:'Space Grotesk', sans-serif; }
+  .mono{ font-family:'JetBrains Mono', monospace; }
+  a{ color:inherit; text-decoration:none; }
+  button{ font-family:inherit; cursor:pointer; border:none; }
 
   @media (prefers-reduced-motion: reduce){
-    *{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important; }
+    *{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; }
   }
 
-  .wrap{ max-width:1180px; margin:0 auto; padding:0 24px; }
-  h1,h2,h3{ font-family:'Bebas Neue', sans-serif; letter-spacing:0.02em; font-weight:400; }
-  .mono{ font-family:'Space Mono', monospace; }
-  a{ color:inherit; text-decoration:none; }
-  ::selection{ background:var(--red); color:#fff; }
-  img,video{ max-width:100%; display:block; }
-
-  .reveal{
-    opacity:0; transform:translateY(30px); transition:opacity 0.8s cubic-bezier(.16,.84,.44,1), transform 0.8s cubic-bezier(.16,.84,.44,1);
-  }
-  .reveal.in{ opacity:1; transform:translateY(0); }
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 20px; }
 
   /* ---------- NAV ---------- */
-  nav{
-    position:fixed; top:0; left:0; right:0; z-index:200;
-    background:rgba(10,10,10,0.9); backdrop-filter:blur(10px); border-bottom:1px solid var(--line);
+  nav{ position:sticky; top:0; z-index:100; background:rgba(11,14,20,0.85); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); }
+  .nav-inner{ max-width:1180px; margin:0 auto; padding:14px 20px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+  .brand{ display:flex; align-items:center; gap:9px; font-family:'Space Grotesk'; font-weight:700; font-size:19px; }
+  .brand .mark{ width:26px; height:26px; border-radius:8px; background:linear-gradient(135deg, var(--teal), var(--violet)); flex-shrink:0; }
+  .tabs{ display:flex; gap:4px; background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:4px; }
+  .tab-btn{ background:transparent; color:var(--muted); font-weight:600; font-size:13.5px; padding:8px 16px; border-radius:7px; transition:all 0.2s; }
+  .tab-btn.active{ background:var(--surface-2); color:var(--text); }
+  .tab-btn:hover:not(.active){ color:var(--text); }
+  #connectBtn{
+    background:linear-gradient(135deg, var(--teal), var(--violet)); color:#08110F; font-weight:700; font-size:13.5px;
+    padding:10px 18px; border-radius:9px; transition:transform 0.2s, box-shadow 0.2s;
   }
-  .nav-inner{ max-width:1180px; margin:0 auto; padding:16px 24px; display:flex; align-items:center; justify-content:space-between; }
-  .logo{ font-family:'Bebas Neue'; font-size:24px; letter-spacing:0.06em; display:flex; align-items:center; gap:8px; color:var(--red); }
-  .logo span.wordmark{ color:var(--text); }
-  .nav-links{ display:flex; gap:30px; font-size:14px; color:var(--muted); font-weight:600; }
-  .nav-links a{ transition:color 0.2s; }
-  .nav-links a:hover{ color:var(--red-bright); }
-  .nav-cta{
-    background:var(--red); color:#fff; padding:9px 18px; border-radius:3px; font-weight:700; font-size:13px;
-    letter-spacing:0.02em; transition:transform 0.2s, box-shadow 0.2s, background 0.2s;
-  }
-  .nav-cta:hover{ background:var(--red-bright); transform:translateY(-2px); box-shadow:0 8px 20px -6px rgba(229,9,20,0.6); }
-  @media (max-width:820px){ .nav-links{ display:none; } }
-  @media (max-width:480px){ .nav-inner{ padding:14px 16px; } .nav-cta{ padding:8px 13px; font-size:12px; } }
+  #connectBtn:hover{ transform:translateY(-2px); box-shadow:0 10px 26px -10px rgba(45,212,191,0.5); }
+  #connectBtn.connected{ background:var(--surface-2); color:var(--teal); border:1px solid rgba(45,212,191,0.4); }
+  @media (max-width:760px){ .tabs{ order:3; width:100%; justify-content:center; } .nav-inner{ flex-wrap:wrap; } }
 
-  /* ---------- HERO (video background) ---------- */
-  .hero{
-    position:relative; min-height:88svh; display:flex; align-items:center;
-    padding:110px 0 40px; overflow:hidden;
+  /* ---------- HERO / SIGNATURE POOL VISUAL ---------- */
+  .hero{ padding:56px 0 30px; text-align:center; position:relative; }
+  .hero .kicker{ font-family:'JetBrains Mono'; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--teal); margin-bottom:14px; display:inline-block; }
+  .hero h1{ font-size:clamp(30px,5vw,46px); font-weight:700; line-height:1.1; margin-bottom:14px; }
+  .hero h1 span{ background:linear-gradient(90deg, var(--teal), var(--violet)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .hero p{ color:var(--muted); max-width:480px; margin:0 auto 34px; font-size:15px; }
+
+  .pool-viz{ position:relative; width:100%; max-width:340px; height:120px; margin:0 auto 10px; }
+  .pool-orb{
+    position:absolute; top:50%; width:78px; height:78px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono'; font-weight:700; font-size:14px;
+    box-shadow:0 0 40px -6px currentColor;
   }
-  .hero-bg{ position:absolute; inset:0; z-index:0; overflow:hidden; }
-  .hero-bg video{
-    position:absolute; top:50%; left:50%; width:100%; height:100%; object-fit:cover;
-    transform:translate(-50%,-50%); filter:brightness(0.55) saturate(1.3);
-  }
-  .hero-bg::after{
+  .pool-orb.a{ left:20%; transform:translate(-50%,-50%); background:radial-gradient(circle at 35% 30%, #4EE8D4, var(--teal)); color:var(--teal); }
+  .pool-orb.b{ left:80%; transform:translate(-50%,-50%); background:radial-gradient(circle at 35% 30%, #B79CFF, var(--violet)); color:var(--violet); }
+  .pool-orb span{ color:#081014; }
+  .pool-flow{ position:absolute; top:50%; left:20%; right:20%; height:2px; transform:translateY(-50%); overflow:hidden; }
+  .pool-flow::before{
     content:''; position:absolute; inset:0;
-    background:
-      linear-gradient(180deg, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0.35) 35%, var(--bg) 96%),
-      linear-gradient(90deg, rgba(10,10,10,0.9) 0%, rgba(10,10,10,0.25) 45%, rgba(10,10,10,0.55) 100%);
+    background:linear-gradient(90deg, var(--teal), var(--violet), var(--teal));
+    background-size:200% 100%; animation:flow 3s linear infinite;
   }
-  #hero-canvas{ position:absolute; inset:0; z-index:1; pointer-events:none; opacity:0.8; mix-blend-mode:screen; }
+  @keyframes flow{ to{ background-position:-200% 0; } }
+  .pool-orb{ animation:orbit 4.5s ease-in-out infinite; }
+  .pool-orb.a{ animation-delay:0s; }
+  .pool-orb.b{ animation-delay:-2.25s; }
+  @keyframes orbit{ 0%,100%{ transform:translate(-50%,-50%) scale(1); } 50%{ transform:translate(-50%,-56%) scale(1.06); } }
 
-  .hero-content{ position:relative; z-index:2; max-width:640px; perspective:1200px; }
+  /* ---------- LAYOUT ---------- */
+  .main-grid{ display:grid; grid-template-columns:1fr; gap:20px; padding-bottom:60px; }
+  .center-col{ max-width:460px; margin:0 auto; width:100%; }
 
-  .eyebrow{
-    display:inline-flex; align-items:center; gap:9px; font-family:'Space Mono'; font-size:11.5px;
-    letter-spacing:0.1em; text-transform:uppercase; color:var(--red-bright);
-    border:1px solid rgba(229,9,20,0.4); padding:6px 13px; border-radius:999px; margin-bottom:22px;
-    background:rgba(229,9,20,0.08);
-  }
-  .eyebrow .rec{ width:7px; height:7px; border-radius:50%; background:var(--red); animation:pulse 1.5s infinite; }
-  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+  /* ---------- SWAP CARD ---------- */
+  .card{ background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:18px; }
+  .card-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+  .card-head h2{ font-size:17px; font-weight:600; }
+  .settings-icon{ width:32px; height:32px; border-radius:8px; background:var(--surface-2); display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:14px; }
 
-  .hero h1{ font-size:clamp(38px, 7vw, 68px); line-height:1.0; margin-bottom:20px; text-shadow:0 10px 40px rgba(0,0,0,0.6); }
-  .hero h1 span{ color:var(--red); }
+  .token-box{ background:var(--surface-2); border:1px solid transparent; border-radius:12px; padding:14px; transition:border-color 0.2s; }
+  .token-box:focus-within{ border-color:rgba(45,212,191,0.4); }
+  .token-box .row1{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+  .token-box .row1 span{ font-size:11.5px; color:var(--muted); font-family:'JetBrains Mono'; }
+  .token-box .row2{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .amount-input{
+    background:transparent; border:none; color:var(--text); font-family:'JetBrains Mono'; font-size:22px; font-weight:500;
+    width:100%; outline:none;
+  }
+  .amount-input::placeholder{ color:#454C5C; }
+  .token-select{
+    display:flex; align-items:center; gap:7px; background:var(--surface); border:1px solid var(--line); border-radius:999px;
+    padding:6px 12px 6px 6px; font-weight:600; font-size:14px; white-space:nowrap; flex-shrink:0;
+  }
+  .token-select .dot{ width:22px; height:22px; border-radius:50%; flex-shrink:0; }
+  .token-select .dot.usdt{ background:linear-gradient(135deg,#26A17B,#1a7a5c); }
+  .token-select .dot.znz{ background:linear-gradient(135deg, var(--teal), var(--violet)); }
 
-  .hero p.lede{ font-size:clamp(15px,2vw,18px); color:var(--muted); max-width:480px; margin-bottom:30px; font-weight:600; }
+  .swap-divider{ display:flex; justify-content:center; margin:-8px 0; position:relative; z-index:2; }
+  .swap-flip{
+    width:34px; height:34px; border-radius:10px; background:var(--surface); border:3px solid var(--bg);
+    display:flex; align-items:center; justify-content:center; color:var(--teal); font-size:14px; transition:transform 0.3s;
+  }
+  .swap-flip:hover{ transform:rotate(180deg); }
 
-  .cta-row{ display:flex; gap:14px; flex-wrap:wrap; align-items:center; }
-  .btn-primary{
-    background:var(--red); color:#fff; padding:14px 26px; border-radius:4px; font-weight:700; font-size:15px;
-    display:inline-flex; align-items:center; gap:8px; transition:transform 0.2s ease, box-shadow 0.2s ease, background 0.2s;
-  }
-  .btn-primary:hover{ background:var(--red-bright); transform:translateY(-3px) scale(1.02); box-shadow:0 16px 34px -10px rgba(229,9,20,0.65); }
-  .btn-primary:active{ transform:translateY(-1px) scale(0.99); }
-  .btn-primary:focus-visible{ outline:3px solid #fff; outline-offset:3px; }
-  .btn-ghost{
-    color:var(--text); padding:14px 20px; font-weight:600; font-size:15px; border:1px solid var(--line);
-    border-radius:4px; transition:border-color 0.2s, background 0.2s; background:rgba(255,255,255,0.06);
-  }
-  .btn-ghost:hover{ border-color:var(--red); background:rgba(229,9,20,0.1); }
+  .rate-line{ display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin:14px 0; font-family:'JetBrains Mono'; }
+  .rate-line b{ color:var(--text); font-weight:500; }
 
-  .trust-strip{ margin-top:44px; display:flex; gap:28px; flex-wrap:wrap; }
-  .trust-item .num{ font-family:'Bebas Neue'; font-size:30px; color:var(--red-bright); }
-  .trust-item .lbl{ font-size:11.5px; color:var(--muted); font-family:'Space Mono'; letter-spacing:0.04em; }
+  .primary-btn{
+    width:100%; padding:15px; border-radius:12px; font-weight:700; font-size:15px; text-align:center;
+    background:linear-gradient(135deg, var(--teal), var(--violet)); color:#081014; transition:opacity 0.2s, transform 0.15s;
+  }
+  .primary-btn:hover{ opacity:0.92; transform:translateY(-1px); }
+  .primary-btn:disabled{ background:var(--surface-2); color:var(--muted); cursor:not-allowed; transform:none; }
+  .primary-btn.pending{ background:var(--surface-2); color:var(--gold); border:1px dashed rgba(240,185,11,0.4); }
 
-  @media (max-width:600px){
-    .hero{ min-height:auto; padding:110px 0 50px; }
-    .trust-strip{ gap:20px; }
+  /* ---------- LIQUIDITY / FARMS SHARED ---------- */
+  .lp-row, .farm-row{
+    display:flex; align-items:center; justify-content:space-between; padding:14px; background:var(--surface-2);
+    border-radius:12px; margin-bottom:10px; border:1px solid transparent; transition:border-color 0.2s;
   }
+  .lp-row:hover, .farm-row:hover{ border-color:rgba(139,92,246,0.3); }
+  .lp-pair{ display:flex; align-items:center; gap:10px; }
+  .lp-icons{ display:flex; }
+  .lp-icons .dot{ width:26px; height:26px; border-radius:50%; border:2px solid var(--surface-2); }
+  .lp-icons .dot:nth-child(2){ margin-left:-10px; }
+  .lp-name{ font-weight:600; font-size:14px; }
+  .lp-sub{ font-size:11px; color:var(--muted); font-family:'JetBrains Mono'; }
+  .apr-tag{ font-family:'JetBrains Mono'; font-size:12px; color:var(--teal); background:rgba(45,212,191,0.12); padding:5px 10px; border-radius:999px; }
+  .small-btn{ background:var(--surface); border:1px solid var(--line); color:var(--text); font-weight:600; font-size:12.5px; padding:8px 14px; border-radius:8px; }
+  .small-btn:hover{ border-color:var(--teal); color:var(--teal); }
 
-  /* ---------- PREVIEW ROW (autoplay video thumbnails) ---------- */
-  .preview-section{ padding:36px 0 50px; position:relative; z-index:2; }
-  .preview-head{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:8px; }
-  .preview-head h2{ font-size:clamp(22px,3vw,30px); }
-  .preview-head .tag{ font-family:'Space Mono'; font-size:11.5px; color:var(--muted); }
+  .empty-note{ text-align:center; color:var(--muted); font-size:13px; padding:20px 0; }
 
-  .preview-row{
-    display:grid; grid-template-columns:repeat(4, 1fr); gap:14px;
-  }
-  @media (max-width:900px){ .preview-row{ grid-template-columns:repeat(2,1fr); } }
-  @media (max-width:480px){ .preview-row{ grid-template-columns:1fr 1fr; gap:10px; } }
+  /* ---------- STATUS / BLUEPRINT PANEL ---------- */
+  .status-section{ padding:20px 0 70px; }
+  .status-head{ text-align:center; margin-bottom:30px; }
+  .status-head .kicker{ font-family:'JetBrains Mono'; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--violet); }
+  .status-head h2{ font-size:clamp(24px,3.5vw,32px); margin-top:10px; }
+  .status-head p{ color:var(--muted); font-size:14px; margin-top:10px; max-width:520px; margin-left:auto; margin-right:auto; }
 
-  .preview-card{
-    position:relative; aspect-ratio:2/3; border-radius:8px; overflow:hidden; background:var(--surface);
-    border:1px solid var(--line); transition:transform 0.35s cubic-bezier(.2,.85,.35,1.2), box-shadow 0.35s ease, border-color 0.35s ease;
-    cursor:pointer;
-  }
-  .preview-card:hover{ transform:scale(1.06) translateY(-6px); box-shadow:0 24px 50px -16px rgba(0,0,0,0.7), 0 0 0 1px rgba(229,9,20,0.4); z-index:5; border-color:transparent; }
-  .preview-card video{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-  .preview-card::before{
-    content:''; position:absolute; inset:0; background:linear-gradient(180deg, transparent 45%, rgba(0,0,0,0.85) 100%); z-index:1;
-  }
-  .preview-meta{ position:absolute; left:0; right:0; bottom:0; padding:12px; z-index:2; }
-  .preview-meta .p-title{ font-family:'Inter'; font-weight:700; font-size:13px; margin-bottom:3px; }
-  .preview-meta .p-sub{ font-family:'Space Mono'; font-size:10px; color:var(--muted); display:flex; align-items:center; gap:6px; }
-  .live-dot{ width:6px; height:6px; border-radius:50%; background:var(--red); animation:pulse 1.5s infinite; }
-  .play-badge{
-    position:absolute; top:10px; right:10px; width:26px; height:26px; border-radius:50%;
-    background:rgba(0,0,0,0.55); border:1px solid rgba(255,255,255,0.25); z-index:2;
-    display:flex; align-items:center; justify-content:center; font-size:10px; backdrop-filter:blur(4px);
-  }
+  .status-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(240px,1fr)); gap:12px; max-width:900px; margin:0 auto; }
+  .status-card{ background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:18px; }
+  .status-card .s-top{ display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .status-dot{ width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+  .status-dot.live{ background:var(--teal); box-shadow:0 0 8px var(--teal); }
+  .status-dot.pending{ background:var(--gold); box-shadow:0 0 8px var(--gold); animation:pulse-dot 1.5s infinite; }
+  @keyframes pulse-dot{ 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+  .status-card h3{ font-size:15px; font-weight:600; }
+  .status-tag{ font-family:'JetBrains Mono'; font-size:10.5px; margin-left:auto; padding:3px 8px; border-radius:999px; }
+  .status-tag.live{ color:var(--teal); background:rgba(45,212,191,0.12); }
+  .status-tag.pending{ color:var(--gold); background:rgba(240,185,11,0.12); }
+  .status-card p{ color:var(--muted); font-size:12.5px; line-height:1.55; }
 
-  /* ---------- SECTION SHELL ---------- */
-  section{ padding:44px 0; }
-  .section-head{ max-width:640px; margin-bottom:22px; }
-  .kicker{
-    font-family:'Space Mono'; font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--red);
-    display:inline-flex; align-items:center; gap:8px; margin-bottom:12px; font-weight:700;
-  }
-  .kicker::before{ content:''; width:18px; height:2px; background:var(--red); display:inline-block; animation:kicker-pulse 1.8s ease-in-out infinite; }
-  @keyframes kicker-pulse{ 0%,100%{ opacity:1; width:18px; } 50%{ opacity:0.4; width:30px; } }
-  .section-head h2{ font-size:clamp(26px,3.6vw,40px); line-height:1.05; }
-  .section-head p{ color:var(--muted); margin-top:12px; font-size:14.5px; max-width:560px; font-weight:600; }
-
-  @media (max-width:600px){ section{ padding:30px 0; } .section-head{ margin-bottom:18px; } }
-
-  /* ---------- SMALL COLORFUL EXPLANATION BOXES (build + benefits) ---------- */
-  .box-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; }
-  @media (max-width:900px){ .box-grid{ grid-template-columns:repeat(2,1fr); } }
-  @media (max-width:560px){ .box-grid{ grid-template-columns:1fr; gap:10px; } }
-
-  .info-box{
-    background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--accent, var(--red));
-    border-radius:8px; padding:16px 16px 0; transform-style:preserve-3d;
-    transition:transform 0.12s ease-out, box-shadow 0.3s ease, border-color 0.3s ease;
-    position:relative; overflow:hidden;
-  }
-  .info-box::after{
-    content:''; position:absolute; inset:0; opacity:0; border-radius:8px;
-    background:radial-gradient(200px circle at var(--mx,50%) var(--my,50%), color-mix(in srgb, var(--accent, var(--red)) 22%, transparent), transparent 60%);
-    transition:opacity 0.3s ease; pointer-events:none;
-  }
-  .info-box:hover{ box-shadow:0 18px 36px -18px rgba(0,0,0,0.65); }
-  .info-box:hover::after{ opacity:1; }
-  .info-box .b-num{
-    font-family:'Space Mono'; font-size:10px; font-weight:700; letter-spacing:0.05em; color:var(--accent, var(--red-bright));
-    margin-bottom:8px; display:inline-block; transform:translateZ(16px);
-    background:color-mix(in srgb, var(--accent, var(--red)) 16%, transparent); padding:3px 8px; border-radius:4px;
-  }
-  .info-box h3{
-    font-size:20px; font-family:'Bebas Neue'; font-weight:400; letter-spacing:0.02em; margin-bottom:6px;
-    transform:translateZ(16px); line-height:1.1; color:var(--text);
-  }
-  .info-box p{ color:var(--muted); font-size:12.5px; font-weight:600; transform:translateZ(16px); line-height:1.5; margin-bottom:14px; }
-
-  /* animated scrolling ticker strip at the bottom of each box */
-  .b-ticker{
-    margin:0 -16px; padding:8px 0; border-top:1px solid var(--line);
-    background:color-mix(in srgb, var(--accent, var(--red)) 10%, transparent);
-    overflow:hidden; white-space:nowrap; transform:translateZ(10px);
-  }
-  .b-ticker .b-ticker-track{ display:inline-block; animation:ticker-scroll 9s linear infinite; }
-  .info-box:hover .b-ticker .b-ticker-track{ animation-play-state:paused; }
-  .b-ticker span{
-    font-family:'Space Mono'; font-size:10.5px; font-weight:700; color:var(--accent, var(--red-bright));
-    padding:0 16px; letter-spacing:0.03em;
-  }
-  @keyframes ticker-scroll{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
-
-  /* ---------- BENEFIT BOXES: plain, non-animated, black/white ---------- */
-  .simple-box{
-    background:#000; border:1px solid rgba(255,255,255,0.22); border-radius:8px; padding:22px 20px;
-  }
-  .simple-box h3{ color:#FFFFFF; font-family:'Inter'; font-weight:800; font-size:19px; margin-bottom:9px; letter-spacing:0.01em; }
-  .simple-box p{ color:#FFFFFF; opacity:0.82; font-weight:500; font-size:13.5px; line-height:1.6; }
-
-  /* ---------- CTA BAND ---------- */
-  .cta-band{
-    background:linear-gradient(120deg, var(--surface), var(--red-deep) 65%, var(--surface));
-    border-radius:14px; padding:56px 32px; text-align:center; position:relative; overflow:hidden; border:1px solid var(--line);
-  }
-  .cta-band::before{
-    content:''; position:absolute; width:360px; height:360px; border-radius:50%;
-    background:radial-gradient(circle, rgba(229,9,20,0.28), transparent 70%);
-    top:-140px; left:-90px; animation:drift 10s ease-in-out infinite alternate;
-  }
-  @keyframes drift{ to{ transform:translate(60px, 40px); } }
-  .cta-band h2{ font-size:clamp(28px,4.5vw,42px); margin-bottom:16px; position:relative; }
-  .cta-band p{ color:var(--muted); margin-bottom:28px; position:relative; font-size:15px; }
-  .cta-band .btn-primary{ position:relative; justify-content:center; }
-
-  footer{ border-top:1px solid var(--line); padding:40px 0 32px; }
-  .foot-grid{ display:flex; justify-content:space-between; flex-wrap:wrap; gap:20px; align-items:center; }
-  .foot-links{ display:flex; gap:22px; font-size:13px; color:var(--muted); flex-wrap:wrap; }
-  .foot-links a{ transition:color 0.2s; }
-  .foot-links a:hover{ color:var(--red-bright); }
-  .copyright{ font-size:12px; color:var(--muted); font-family:'Space Mono'; }
+  footer{ border-top:1px solid var(--line); padding:24px 0; text-align:center; }
+  footer p{ color:var(--muted); font-size:12px; font-family:'JetBrains Mono'; }
 </style>
 </head>
 <body>
 
 <nav>
   <div class="nav-inner">
-    <div class="logo">STREAM<span class="wordmark">FORGE</span></div>
-    <div class="nav-links">
-      <a href="#preview">प्रीव्यू</a>
-      <a href="#build">क्या बनाते हैं</a>
-      <a href="#benefits">फायदे</a>
+    <div class="brand"><span class="mark"></span>ZirakSwap</div>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="swap">Swap</button>
+      <button class="tab-btn" data-tab="liquidity">Liquidity</button>
+      <button class="tab-btn" data-tab="farms">Farms</button>
     </div>
-    <a href="https://wa.me/917696603999?text=Hi%2C%20mujhe%20apna%20streaming%20app%20banwana%20hai" target="_blank" rel="noopener" class="nav-cta">प्रोजेक्ट शुरू करें</a>
+    <button id="connectBtn">Connect Wallet</button>
   </div>
 </nav>
 
 <header class="hero">
-  <div class="hero-bg">
-    <video autoplay muted loop playsinline preload="auto" poster="">
-      <source src="https://assets.mixkit.co/videos/35333/35333-360.mp4" type="video/mp4">
-    </video>
-  </div>
-  <canvas id="hero-canvas"></canvas>
-
   <div class="wrap">
-    <div class="hero-content">
-      <div class="eyebrow"><span class="rec"></span> अभी 6 स्ट्रीमिंग ऐप्स बिल्ड हो रहे हैं</div>
-      <h1>हम आपके लिए <span>Netflix जैसा</span> स्ट्रीमिंग ऐप बनाते हैं</h1>
-      <p class="lede">वेब, iOS, Android और Smart TV — एक ही प्लेटफॉर्म पर। वीडियो अपलोड से लेकर सब्सक्रिप्शन बिलिंग तक, पूरा स्टूडियो एक्सपीरियंस आपके ब्रांड के नाम से।</p>
-      <div class="cta-row">
-        <a href="https://wa.me/917696603999?text=Hi%2C%20mujhe%20apna%20streaming%20app%20banwana%20hai" target="_blank" rel="noopener" class="btn-primary">▶ अपना ऐप बनवाएं</a>
-        <a href="#build" class="btn-ghost">कैसे काम करता है ↓</a>
-      </div>
-      <div class="trust-strip">
-        <div class="trust-item"><div class="num">4K</div><div class="lbl">स्ट्रीमिंग क्वालिटी तक</div></div>
-        <div class="trust-item"><div class="num">6–10</div><div class="lbl">हफ्तों में लॉन्च</div></div>
-        <div class="trust-item"><div class="num">100%</div><div class="lbl">आपके ब्रांड नेम पर</div></div>
-      </div>
+    <span class="kicker">// BLUEPRINT — SMART CONTRACT आने वाला है</span>
+    <h1>अपने टोकन <span>Swap</span> करें, बिना किसी बिचौलिए के</h1>
+    <p>ये UI ढांचा तैयार है — swap, liquidity और farming, सब आपस में जुड़े हुए। असली token transfer तब शुरू होगा जब स्मार्ट कॉन्ट्रैक्ट कनेक्ट होगा।</p>
+    <div class="pool-viz">
+      <div class="pool-flow"></div>
+      <div class="pool-orb a"><span>USDT</span></div>
+      <div class="pool-orb b"><span>ZNZ</span></div>
     </div>
   </div>
 </header>
 
-<section id="preview" class="preview-section">
+<main class="wrap main-grid">
+  <div class="center-col">
+
+    <!-- ===== SWAP TAB ===== -->
+    <section id="tab-swap" class="card">
+      <div class="card-head"><h2>Swap</h2><div class="settings-icon">⚙</div></div>
+
+      <div class="token-box">
+        <div class="row1"><span>आप देंगे</span><span>Balance: 0.00</span></div>
+        <div class="row2">
+          <input type="text" class="amount-input mono" placeholder="0.0" inputmode="decimal">
+          <div class="token-select"><span class="dot usdt"></span>USDT</div>
+        </div>
+      </div>
+
+      <div class="swap-divider"><div class="swap-flip">⇅</div></div>
+
+      <div class="token-box">
+        <div class="row1"><span>आपको मिलेगा (अनुमानित)</span><span>Balance: 0.00</span></div>
+        <div class="row2">
+          <input type="text" class="amount-input mono" placeholder="0.0" inputmode="decimal" disabled>
+          <div class="token-select"><span class="dot znz"></span>ZNZ</div>
+        </div>
+      </div>
+
+      <div class="rate-line">
+        <span>Rate</span>
+        <b>1 USDT = — ZNZ <span style="color:var(--gold)">(contract pending)</span></b>
+      </div>
+      <div class="rate-line">
+        <span>Slippage Tolerance</span>
+        <b>0.5%</b>
+      </div>
+
+      <button class="primary-btn pending" id="swapBtn">Smart Contract जल्द जुड़ेगा</button>
+    </section>
+
+    <!-- ===== LIQUIDITY TAB ===== -->
+    <section id="tab-liquidity" class="card" style="display:none">
+      <div class="card-head"><h2>Liquidity Pools</h2><button class="small-btn">+ Add Liquidity</button></div>
+
+      <div class="lp-row">
+        <div class="lp-pair">
+          <div class="lp-icons"><span class="dot usdt" style="width:26px;height:26px;display:inline-block;border-radius:50%;background:linear-gradient(135deg,#26A17B,#1a7a5c);border:2px solid var(--surface-2);"></span><span class="dot znz" style="width:26px;height:26px;display:inline-block;border-radius:50%;background:linear-gradient(135deg, var(--teal), var(--violet));border:2px solid var(--surface-2);margin-left:-10px;"></span></div>
+          <div><div class="lp-name">USDT / ZNZ</div><div class="lp-sub">Pool ID: pending</div></div>
+        </div>
+        <span class="apr-tag">APR: —</span>
+      </div>
+
+      <p class="empty-note">Liquidity pools contract deploy होने के बाद यहाँ live TVL और आपकी LP position दिखेगी।</p>
+    </section>
+
+    <!-- ===== FARMS TAB ===== -->
+    <section id="tab-farms" class="card" style="display:none">
+      <div class="card-head"><h2>Yield Farms</h2></div>
+
+      <div class="farm-row">
+        <div class="lp-pair">
+          <div class="lp-icons"><span style="width:26px;height:26px;display:inline-block;border-radius:50%;background:linear-gradient(135deg,#26A17B,#1a7a5c);border:2px solid var(--surface-2);"></span><span style="width:26px;height:26px;display:inline-block;border-radius:50%;background:linear-gradient(135deg, var(--teal), var(--violet));border:2px solid var(--surface-2);margin-left:-10px;"></span></div>
+          <div><div class="lp-name">USDT-ZNZ LP</div><div class="lp-sub">Reward: ZNZ token</div></div>
+        </div>
+        <span class="apr-tag">APR: —</span>
+      </div>
+
+      <p class="empty-note">Farm staking contract जुड़ते ही यहाँ से LP tokens stake करके reward कमाना शुरू कर सकेंगे।</p>
+    </section>
+
+  </div>
+</main>
+
+<section class="status-section">
   <div class="wrap">
-    <div class="preview-head reveal">
-      <h2>असली प्रीव्यू — ऐसा दिखेगा आपका ऐप</h2>
-      <span class="tag mono">AUTOPLAY · MUTED · LOOP</span>
+    <div class="status-head">
+      <span class="kicker">// PROJECT STATUS</span>
+      <h2>Blueprint का हाल — क्या live है, क्या बाकी है</h2>
+      <p>ये पूरा DEX अभी frontend blueprint है। हर हिस्सा दिखने में तैयार है, असली fund movement smart contract जुड़ने के बाद ही शुरू होगा।</p>
     </div>
-    <div class="preview-row">
-      <div class="preview-card reveal">
-        <video autoplay muted loop playsinline preload="none">
-          <source src="videoplayback.mp4" type="video/mp4">
-        </video>
-        <span class="play-badge">▶</span>
-        <div class="preview-meta"><div class="p-title">डेमो 1</div><div class="p-sub"><span class="live-dot"></span>ट्रेलर चल रहा है</div></div>
-      </div>
-      <div class="preview-card reveal">
-        <video autoplay muted loop playsinline preload="none">
-          <source src="videoplayback%20%281%29.mp4" type="video/mp4">
-        </video>
-        <span class="play-badge">▶</span>
-        <div class="preview-meta"><div class="p-title">डेमो 2</div><div class="p-sub"><span class="live-dot"></span>ट्रेलर चल रहा है</div></div>
-      </div>
-      <div class="preview-card reveal">
-        <video autoplay muted loop playsinline preload="none">
-          <source src="videoplayback%20%282%29.mp4" type="video/mp4">
-        </video>
-        <span class="play-badge">▶</span>
-        <div class="preview-meta"><div class="p-title">डेमो 3</div><div class="p-sub"><span class="live-dot"></span>ट्रेलर चल रहा है</div></div>
-      </div>
-      <div class="preview-card reveal">
-        <video autoplay muted loop playsinline preload="none">
-          <source src="videoplayback%20%281%29%20%282%29.mp4" type="video/mp4">
-        </video>
-        <span class="play-badge">▶</span>
-        <div class="preview-meta"><div class="p-title">डेमो 4</div><div class="p-sub"><span class="live-dot"></span>ट्रेलर चल रहा है</div></div>
-      </div>
+    <div class="status-grid">
+      <div class="status-card"><div class="s-top"><span class="status-dot live"></span><h3>Wallet Connect</h3><span class="status-tag live">LIVE</span></div><p>MetaMask/Web3 wallet से जुड़ना अभी से काम करता है — असली functional कोड।</p></div>
+      <div class="status-card"><div class="s-top"><span class="status-dot pending"></span><h3>Swap Execution</h3><span class="status-tag pending">PENDING</span></div><p>Router contract address और ABI जोड़ने के बाद असली token swap शुरू होगा।</p></div>
+      <div class="status-card"><div class="s-top"><span class="status-dot pending"></span><h3>Liquidity Pools</h3><span class="status-tag pending">PENDING</span></div><p>Factory/Pair contracts deploy होने के बाद pool creation और LP tracking जुड़ेगी।</p></div>
+      <div class="status-card"><div class="s-top"><span class="status-dot pending"></span><h3>Farming / Staking</h3><span class="status-tag pending">PENDING</span></div><p>MasterChef-स्टाइल staking contract जुड़ने के बाद reward distribution शुरू होगी।</p></div>
+      <div class="status-card"><div class="s-top"><span class="status-dot pending"></span><h3>Price Feed / Charts</h3><span class="status-tag pending">PENDING</span></div><p>On-chain data आने के बाद real-time price aur chart यहाँ जुड़ेगा।</p></div>
+      <div class="status-card"><div class="s-top"><span class="status-dot live"></span><h3>UI / UX Structure</h3><span class="status-tag live">LIVE</span></div><p>Swap, Liquidity, Farms — तीनों tabs का पूरा ढांचा तैयार है।</p></div>
     </div>
   </div>
 </section>
 
-<section id="build">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <span class="kicker">हम क्या बनाते हैं</span>
-      <h2>एक स्ट्रीमिंग ऐप में जो कुछ भी होना चाहिए</h2>
-      <p>हर हिस्सा शुरू से आपके कंटेंट और ऑडियंस के हिसाब से डिज़ाइन होता है — किसी टेम्पलेट की कॉपी नहीं।</p>
-    </div>
+<footer><p>ZIRAKSWAP · BLUEPRINT BUILD · SMART CONTRACT INTEGRATION PENDING</p></footer>
 
-    <div class="box-grid">
-      <div class="info-box tilt-box reveal" style="--accent:#E50914">
-        <span class="b-num mono">01 / VOD</span>
-        <h3>वीडियो ऑन डिमांड</h3>
-        <p>अपलोड करते ही 480p से 4K तक ऑटो-एनकोड, बिना बफरिंग प्लेबैक।</p>
-        <div class="b-ticker"><span class="b-ticker-track"><span>⚡ ऑटो एनकोडिंग</span><span>🎞️ 4K तक</span><span>📶 ज़ीरो बफरिंग</span><span>⚡ ऑटो एनकोडिंग</span><span>🎞️ 4K तक</span><span>📶 ज़ीरो बफरिंग</span></span></div>
-      </div>
-      <div class="info-box tilt-box reveal" style="--accent:#F5A623">
-        <span class="b-num mono">02 / LIVE</span>
-        <h3>लाइव स्ट्रीमिंग</h3>
-        <p>इवेंट सीधा प्रसारित करें, लाइव चैट के साथ, रिकॉर्डिंग अपने आप VOD में सेव।</p>
-        <div class="b-ticker"><span class="b-ticker-track"><span>🔴 रियल टाइम</span><span>💬 लाइव चैट</span><span>👀 व्यूअर काउंट</span><span>🔴 रियल टाइम</span><span>💬 लाइव चैट</span><span>👀 व्यूअर काउंट</span></span></div>
-      </div>
-      <div class="info-box tilt-box reveal" style="--accent:#8B5CF6">
-        <span class="b-num mono">03 / PAY</span>
-        <h3>सब्सक्रिप्शन</h3>
-        <p>मासिक, सालाना या पे-पर-व्यू। UPI, कार्ड, विदेशी गेटवे — सब इंटीग्रेटेड।</p>
-        <div class="b-ticker"><span class="b-ticker-track"><span>💳 UPI/कार्ड</span><span>🔁 ऑटो-रिन्यूअल</span><span>🌍 ग्लोबल पेमेंट</span><span>💳 UPI/कार्ड</span><span>🔁 ऑटो-रिन्यूअल</span><span>🌍 ग्लोबल पेमेंट</span></span></div>
-      </div>
-      <div class="info-box tilt-box reveal" style="--accent:#2E9BF0">
-        <span class="b-num mono">04 / MULTI</span>
-        <h3>मल्टी-डिवाइस</h3>
-        <p>मोबाइल, वेब, Smart TV — एक लॉगिन से हर स्क्रीन पर वहीं से देखें।</p>
-        <div class="b-ticker"><span class="b-ticker-track"><span>📱 iOS/Android</span><span>📺 Smart TV</span><span>💻 वेब ऐप</span><span>📱 iOS/Android</span><span>📺 Smart TV</span><span>💻 वेब ऐप</span></span></div>
-      </div>
-      <div class="info-box tilt-box reveal" style="--accent:#2ECC71">
-        <span class="b-num mono">05 / AI</span>
-        <h3>रिकमेंडेशन</h3>
-        <p>देखने की आदत से होमपेज पर्सनलाइज़, ज़्यादा वॉच-टाइम की गारंटी।</p>
-        <div class="b-ticker"><span class="b-ticker-track"><span>🎯 पर्सनलाइज़्ड</span><span>📈 ज़्यादा वॉच-टाइम</span><span>🤖 AI बेस्ड</span><span>🎯 पर्सनलाइज़्ड</span><span>📈 ज़्यादा वॉच-टाइम</span><span>🤖 AI बेस्ड</span></span></div>
-      </div>
-      <div class="info-box tilt-box reveal" style="--accent:#FF3D71">
-        <span class="b-num mono">06 / ADMIN</span>
-        <h3>एडमिन डैशबोर्ड</h3>
-        <p>अपलोड, यूज़र, कमाई — सब एक डैशबोर्ड से, बिना टेक्निकल नॉलेज के।</p>
-        <div class="b-ticker"><span class="b-ticker-track"><span>📊 फुल एनालिटिक्स</span><span>👥 यूज़र मैनेजमेंट</span><span>💰 कमाई रिपोर्ट</span><span>📊 फुल एनालिटिक्स</span><span>👥 यूज़र मैनेजमेंट</span><span>💰 कमाई रिपोर्ट</span></span></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="benefits" class="benefits" style="background:var(--bg-soft);">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <span class="kicker">क्यों बनवाएं</span>
-      <h2>अपना स्ट्रीमिंग ऐप होने के फायदे</h2>
-      <p>YouTube या सोशल मीडिया पर निर्भर रहने की जगह — अपने कंटेंट, ऑडियंस और कमाई पर पूरा कंट्रोल रखें।</p>
-    </div>
-
-    <div class="box-grid">
-      <div class="simple-box reveal">
-        <h3>सीधी कमाई</h3>
-        <p>सब्सक्रिप्शन और पेमेंट सीधे आपके अकाउंट में आते हैं — किसी और प्लेटफॉर्म का कमीशन नहीं कटता।</p>
-      </div>
-      <div class="simple-box reveal">
-        <h3>डेटा आपका</h3>
-        <p>कौन क्या देखता है, कितनी देर देखता है — ये पूरा डेटा आपकी प्रॉपर्टी है, किसी और की नहीं।</p>
-      </div>
-      <div class="simple-box reveal">
-        <h3>ब्रांड आपका</h3>
-        <p>नाम, लोगो, रंग — हर चीज़ आपकी पहचान से मेल खाती है, पूरी तरह आपके कंट्रोल में।</p>
-      </div>
-      <div class="simple-box reveal">
-        <h3>डायरेक्ट पहुंच</h3>
-        <p>एल्गोरिद्म पर निर्भर नहीं रहना पड़ता — नोटिफिकेशन से सीधे अपनी ऑडियंस तक पहुंचें।</p>
-      </div>
-      <div class="simple-box reveal">
-        <h3>ऑफलाइन देखें</h3>
-        <p>दर्शक एपिसोड डाउनलोड करके बिना इंटरनेट के भी देख सकते हैं, कम स्पीड इलाकों में भी।</p>
-      </div>
-      <div class="simple-box reveal">
-        <h3>ऑटो-स्केल</h3>
-        <p>100 यूज़र हों या 1 लाख — इंफ्रास्ट्रक्चर अपने आप स्केल होता है, बिना किसी चिंता के।</p>
-      </div>
-      <div class="simple-box reveal">
-        <h3>विज्ञापन से एक्स्ट्रा कमाई</h3>
-        <p>सब्सक्रिप्शन के अलावा, ऐप में वीडियो के बीच या पहले विज्ञापन (ads) दिखाकर भी कमाई कर सकते हैं — जितने ज़्यादा व्यूअर, उतनी ज़्यादा ad-revenue।</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="contact">
-  <div class="wrap">
-    <div class="cta-band reveal">
-      <h2>अपना स्ट्रीमिंग ऐप बनाने के लिए तैयार हैं?</h2>
-      <p>डिस्कवरी कॉल बुक करें — 30 मिनट में बताएंगे कि आपके कंटेंट के लिए सबसे सही रास्ता क्या है।</p>
-      <a href="https://wa.me/917696603999?text=Hi%2C%20mujhe%20apna%20streaming%20app%20banwana%20hai" target="_blank" rel="noopener" class="btn-primary">▶ WhatsApp पर बात करें</a>
-    </div>
-  </div>
-</section>
-
-<footer>
-  <div class="wrap foot-grid">
-    <div class="logo">STREAM<span class="wordmark">FORGE</span></div>
-    <div class="foot-links">
-      <a href="#preview">प्रीव्यू</a>
-      <a href="#build">क्या बनाते हैं</a>
-      <a href="#benefits">फायदे</a>
-      <a href="https://wa.me/917696603999" target="_blank" rel="noopener">संपर्क करें</a>
-    </div>
-    <div class="copyright">© 2026 STREAMFORGE STUDIO</div>
-  </div>
-</footer>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-(function(){
-  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var isMobile = window.innerWidth <= 760;
+/* =========================================================
+   WALLET CONNECT — यह हिस्सा असली/functional है (MetaMask)
+   ========================================================= */
+const connectBtn = document.getElementById('connectBtn');
+let walletAddress = null;
 
-  /* ---- lazy-load preview videos as they enter viewport (mobile data friendly) ---- */
-  document.querySelectorAll('.preview-card video').forEach(function(v){
-    var src = v.querySelector('source').getAttribute('src');
-    if('IntersectionObserver' in window){
-      var vio = new IntersectionObserver(function(entries){
-        entries.forEach(function(e){
-          if(e.isIntersecting){
-            v.setAttribute('preload','auto');
-            v.load(); v.play().catch(function(){});
-            vio.unobserve(v);
-          }
-        });
-      }, { threshold:0.25 });
-      vio.observe(v);
-    } else {
-      v.load();
-    }
+connectBtn.addEventListener('click', async () => {
+  if(typeof window.ethereum === 'undefined'){
+    alert('MetaMask या कोई Web3 wallet install नहीं मिला। कृपया MetaMask install करें।');
+    return;
+  }
+  try{
+    const accounts = await window.ethereum.request({ method:'eth_requestAccounts' });
+    walletAddress = accounts[0];
+    connectBtn.textContent = walletAddress.slice(0,6) + '...' + walletAddress.slice(-4);
+    connectBtn.classList.add('connected');
+  }catch(err){
+    console.error('Wallet connect failed:', err);
+  }
+});
+
+/* =========================================================
+   TAB SWITCHING
+   ========================================================= */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const target = btn.dataset.tab;
+    ['swap','liquidity','farms'].forEach(t => {
+      document.getElementById('tab-' + t).style.display = (t === target) ? 'block' : 'none';
+    });
   });
+});
 
-  /* ---- scroll reveal ---- */
-  var els = document.querySelectorAll('.reveal');
-  if('IntersectionObserver' in window && !reduced){
-    var io = new IntersectionObserver(function(entries){
-      entries.forEach(function(e){
-        if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
-      });
-    }, { threshold:0.12 });
-    els.forEach(function(el){ io.observe(el); });
-  } else {
-    els.forEach(function(el){ el.classList.add('in'); });
+/* =========================================================
+   ★★★ SMART CONTRACT INTEGRATION POINT ★★★
+   यहाँ बाद में असली router/factory/staking contract जोड़ना है।
+   जब contract तैयार हो जाए, नीचे दिए गए placeholders भरें:
+   ========================================================= */
+
+// 1) Contract addresses (deploy होने के बाद यहाँ डालें)
+const CONTRACT_ADDRESSES = {
+  router:  "0x0000000000000000000000000000000000000000", // PancakeSwap-style Router
+  factory: "0x0000000000000000000000000000000000000000", // Pair Factory
+  masterChef: "0x0000000000000000000000000000000000000000" // Farming/Staking contract
+};
+
+// 2) ABI (contract compile करने के बाद यहाँ paste करें)
+const ROUTER_ABI = [ /* TODO: paste Router ABI here */ ];
+const FACTORY_ABI = [ /* TODO: paste Factory ABI here */ ];
+
+// 3) Swap function — अभी सिर्फ placeholder alert दिखाता है
+document.getElementById('swapBtn').addEventListener('click', () => {
+  if(!walletAddress){
+    alert('पहले wallet connect करें।');
+    return;
   }
-
-  /* ---- 3D tilt on info boxes (desktop only, skip on touch for performance) ---- */
-  if(!reduced && !isMobile){
-    document.querySelectorAll('.tilt-box').forEach(function(card){
-      card.addEventListener('mousemove', function(e){
-        var r = card.getBoundingClientRect();
-        var x = e.clientX - r.left, y = e.clientY - r.top;
-        var cx = x / r.width - 0.5, cy = y / r.height - 0.5;
-        card.style.transform = 'rotateY(' + (cx*8) + 'deg) rotateX(' + (-cy*8) + 'deg)';
-        card.style.setProperty('--mx', x + 'px');
-        card.style.setProperty('--my', y + 'px');
-      });
-      card.addEventListener('mouseleave', function(){ card.style.transform = 'rotateY(0deg) rotateX(0deg)'; });
-    });
-  }
-
-  /* ---- Three.js floating rings in hero (skip on small screens to save battery/data) ---- */
-  var canvas = document.getElementById('hero-canvas');
-  if(canvas && window.THREE && !reduced && !isMobile){
-    var hero = canvas.parentElement;
-    var w = hero.clientWidth, h = hero.clientHeight;
-
-    var renderer = new THREE.WebGLRenderer({ canvas:canvas, alpha:true, antialias:true });
-    renderer.setSize(w, h);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-    var scene = new THREE.Scene();
-    var camera = new THREE.PerspectiveCamera(45, w/h, 0.1, 100);
-    camera.position.set(0, 0, 14);
-
-    var group = new THREE.Group();
-    scene.add(group);
-
-    var redMat = new THREE.MeshBasicMaterial({ color:0xE50914, transparent:true, opacity:0.32, wireframe:true });
-    var redDeepMat = new THREE.MeshBasicMaterial({ color:0x9c0d14, transparent:true, opacity:0.26, wireframe:true });
-
-    var ring1 = new THREE.Mesh(new THREE.TorusGeometry(4.2, 0.05, 16, 100), redMat);
-    ring1.position.set(6.5, 1.2, -4); ring1.rotation.x = 1.1;
-    group.add(ring1);
-
-    var ring2 = new THREE.Mesh(new THREE.TorusGeometry(2.6, 0.045, 16, 100), redDeepMat);
-    ring2.position.set(-6, -2, -3); ring2.rotation.x = 0.6; ring2.rotation.y = 0.8;
-    group.add(ring2);
-
-    var ring3 = new THREE.Mesh(new THREE.IcosahedronGeometry(1.2, 0), redMat.clone());
-    ring3.material.opacity = 0.2;
-    ring3.position.set(5.5, -2.6, -2);
-    group.add(ring3);
-
-    var mouseX = 0, mouseY = 0;
-    hero.addEventListener('mousemove', function(e){
-      var r = hero.getBoundingClientRect();
-      mouseX = (e.clientX - r.left) / r.width - 0.5;
-      mouseY = (e.clientY - r.top) / r.height - 0.5;
-    });
-
-    function animate(){
-      requestAnimationFrame(animate);
-      ring1.rotation.z += 0.0025; ring1.rotation.y += 0.0012;
-      ring2.rotation.z -= 0.002;
-      ring3.rotation.x += 0.004; ring3.rotation.y += 0.003;
-      group.rotation.y += (mouseX*0.3 - group.rotation.y) * 0.03;
-      group.rotation.x += (-mouseY*0.2 - group.rotation.x) * 0.03;
-      renderer.render(scene, camera);
-    }
-    animate();
-
-    window.addEventListener('resize', function(){
-      var nw = hero.clientWidth, nh = hero.clientHeight;
-      camera.aspect = nw/nh; camera.updateProjectionMatrix();
-      renderer.setSize(nw, nh);
-    });
-  }
-})();
+  alert('Smart contract अभी जुड़ा नहीं है। Router contract address और ABI जोड़ने के बाद यहाँ से असली swap काम करेगा।');
+  // TODO: यहाँ ethers.js/web3.js से router.swapExactTokensForTokens() जैसा असली call आएगा
+});
 </script>
 
 </body>
