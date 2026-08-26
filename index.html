@@ -199,8 +199,19 @@
   @keyframes dot-pulse{ 0%,100%{ box-shadow:0 0 0 5px rgba(45,212,191,0.14), 0 0 18px 2px rgba(45,212,191,0.85); } 50%{ box-shadow:0 0 0 8px rgba(45,212,191,0.08), 0 0 26px 4px rgba(45,212,191,1); } }
 
   .primary-btn.pending{
-    color:#0F3D33; justify-content:center;
+    justify-content:center; color:#fff;
+    background:linear-gradient(180deg, #2FE0D6 0%, #1EC9BE 55%, #16B0A6 100%);
+    box-shadow:0 4px 0 0 #0E8880, 0 10px 22px -8px rgba(30,201,190,0.55);
+    animation:btn-breathe-teal 2.8s ease-in-out infinite;
   }
+  @keyframes btn-breathe-teal{
+    0%,100%{ transform:translateZ(24px) translateY(0) scale(1); }
+    50%{ transform:translateZ(24px) translateY(-2px) scale(1.012); }
+  }
+  .primary-btn.pending:hover{ transform:translateZ(24px) translateY(-3px); box-shadow:0 6px 0 0 #0E8880, 0 14px 28px -8px rgba(30,201,190,0.6); }
+  .primary-btn.pending:active{ transform:translateZ(24px) translateY(2px); box-shadow:0 1px 0 0 #0E8880, 0 4px 12px -6px rgba(30,201,190,0.5); }
+  .primary-btn .btn-wallet-icon{ display:none; flex-shrink:0; width:19px; height:19px; }
+  .primary-btn.pending .btn-wallet-icon{ display:block; }
   .primary-btn.pending .btn-dot{ display:none; }
   .primary-btn:not(.pending):hover{
     transform:translateZ(24px) translateY(-4px) scale(1.015);
@@ -299,6 +310,11 @@
 
         <button class="primary-btn pending" id="swapBtn">
           <span class="btn-label" id="swapBtnLabel">Connect Wallet to Swap</span>
+          <svg class="btn-wallet-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"></path>
+            <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path>
+            <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"></path>
+          </svg>
           <span class="btn-dot"></span>
         </button>
       </div>
