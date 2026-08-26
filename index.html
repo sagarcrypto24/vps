@@ -101,20 +101,32 @@
   .settings-icon svg{ width:17px; height:17px; transition:transform 0.3s; }
   .settings-icon.open svg{ transform:rotate(-45deg); }
 
-  .settings-panel{
-    position:absolute; top:52px; right:0; width:220px; background:var(--surface); border:1px solid var(--line);
-    border-radius:12px; padding:14px; box-shadow:0 20px 50px -16px rgba(0,0,0,0.7); z-index:999;
-    opacity:0; transform:translateY(-8px) scale(0.97) translateZ(60px); transform-style:flat; pointer-events:none; transition:all 0.2s ease;
+  .settings-backdrop{
+    position:fixed; inset:0; background:rgba(0,0,0,0.55); backdrop-filter:blur(3px); z-index:998;
+    opacity:0; pointer-events:none; transition:opacity 0.25s ease;
   }
-  .settings-panel.show{ opacity:1; transform:translateY(0) scale(1) translateZ(60px); pointer-events:auto; }
-  .settings-panel .sp-label{ font-size:11px; color:var(--muted); font-family:'JetBrains Mono'; margin-bottom:8px; }
-  .sp-options{ display:flex; gap:6px; }
+  .settings-backdrop.show{ opacity:1; pointer-events:auto; }
+
+  .settings-panel{
+    position:fixed; top:50%; left:50%; width:min(300px, 88vw); background:var(--surface); border:1px solid var(--line);
+    border-radius:16px; padding:20px; box-shadow:0 30px 70px -20px rgba(0,0,0,0.8); z-index:999;
+    opacity:0; transform:translate(-50%,-50%) scale(0.94); pointer-events:none; transition:opacity 0.22s ease, transform 0.22s ease;
+  }
+  .settings-panel.show{ opacity:1; transform:translate(-50%,-50%) scale(1); pointer-events:auto; }
+  .settings-panel .sp-title{ font-family:'Space Grotesk'; font-size:17px; font-weight:700; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; }
+  .settings-panel .sp-close{ width:26px; height:26px; border-radius:7px; background:var(--surface-2); display:flex; align-items:center; justify-content:center; color:var(--muted); cursor:pointer; }
+  .settings-panel .sp-close:hover{ color:var(--text); }
+  .settings-panel .sp-label{ font-size:11px; color:var(--muted); font-family:'JetBrains Mono'; margin-bottom:9px; letter-spacing:0.03em; }
+  .sp-options{ display:flex; gap:7px; margin-bottom:12px; }
   .sp-opt{
     flex:1; background:var(--surface-2); border:1px solid transparent; color:var(--muted); font-family:'JetBrains Mono';
-    font-size:12px; font-weight:600; padding:7px 0; border-radius:7px; transition:all 0.2s; text-align:center;
+    font-size:13px; font-weight:600; padding:9px 0; border-radius:8px; transition:all 0.2s; text-align:center; cursor:pointer;
   }
   .sp-opt.active{ background:rgba(45,212,191,0.14); border-color:var(--teal); color:var(--teal); }
   .sp-opt:hover{ color:var(--text); }
+  .sp-custom{ display:flex; align-items:center; gap:8px; background:var(--surface-2); border:1px solid var(--line); border-radius:8px; padding:9px 12px; }
+  .sp-custom input{ background:transparent; border:none; outline:none; color:var(--text); font-family:'JetBrains Mono'; font-size:13px; width:100%; }
+  .sp-custom span{ color:var(--muted); font-family:'JetBrains Mono'; font-size:13px; }
 
   .token-box{ background:var(--surface-2); border:1px solid transparent; border-radius:14px; padding:18px 15px; transition:border-color 0.2s, box-shadow 0.2s; transform:translateZ(20px); }
   .token-box:focus-within{ border-color:rgba(45,212,191,0.45); box-shadow:0 0 0 3px rgba(45,212,191,0.1); }
@@ -131,7 +143,18 @@
   .token-select .dot.znz img{ width:100%; height:100%; object-fit:cover; }
 
   .swap-divider{ display:flex; justify-content:center; margin:-10px 0; position:relative; z-index:3; transform:translateZ(28px); }
-  .swap-flip{ width:36px; height:36px; border-radius:11px; background:var(--surface); border:3px solid var(--surface); box-shadow:0 0 0 3px var(--surface), 0 6px 18px -6px rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; color:var(--teal); font-size:15px; transition:transform 0.3s; }
+  .swap-flip{
+    width:38px; height:38px; border-radius:11px; background:var(--surface); border:3px solid var(--surface);
+    box-shadow:0 0 0 3px var(--surface), 0 6px 18px -6px rgba(0,0,0,0.6);
+    display:flex; align-items:center; justify-content:center; color:var(--teal);
+    cursor:pointer; transition:box-shadow 0.25s ease, border-color 0.25s ease;
+  }
+  .swap-flip svg{ width:18px; height:18px; transition:transform 0.45s cubic-bezier(.34,1.56,.64,1); }
+  .swap-flip:hover{ box-shadow:0 0 0 3px var(--surface), 0 0 18px -2px rgba(45,212,191,0.5); }
+  .swap-flip:hover svg{ transform:rotate(180deg); }
+  .swap-flip:active svg{ transform:rotate(180deg) scale(0.85); }
+  .swap-flip.spin svg{ animation:flip-spin 0.5s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes flip-spin{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
   .swap-flip:hover{ transform:rotate(180deg); }
 
   .rate-line{ display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin:14px 0; font-family:'JetBrains Mono'; transform:translateZ(18px); }
@@ -171,7 +194,7 @@
   <div class="swap-wrap">
     <div class="pool-viz">
       <div class="pool-flow"></div>
-      <div class="pool-orb a"><span>USDT</span></div>
+      <div class="pool-orb a"><span><svg viewBox="0 0 32 32" fill="white" style="width:26px;height:26px;"><path d="M17.9 17.4v-.01c-.11.01-.68.04-1.95.04-1.01 0-1.72-.03-1.97-.04v.01c-3.9-.17-6.81-.85-6.81-1.66s2.91-1.49 6.81-1.66v2.65c.25.02.98.06 1.99.06 1.21 0 1.82-.05 1.93-.06v-2.65c3.89.17 6.79.85 6.79 1.66s-2.9 1.48-6.79 1.66m0-3.59v-2.37h5.43V7.5H8.56v3.94h5.43v2.37c-4.41.2-7.73 1.07-7.73 2.12s3.32 1.91 7.73 2.12v7.59h3.91v-7.59c4.4-.2 7.72-1.07 7.72-2.12s-3.32-1.91-7.72-2.12"/></svg></span></div>
       <div class="pool-orb b" style="background:#fff;padding:5px;box-shadow:0 0 34px -2px #FF9017, 0 0 8px 0 #FF9017;"><img src="assets/shiba.png" alt="SHIB" style="width:100%;height:100%;object-fit:contain;border-radius:50%;"></div>
     </div>
 
@@ -185,28 +208,39 @@
               <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
             </svg>
           </div>
+          <div class="settings-backdrop" id="settingsBackdrop"></div>
           <div class="settings-panel" id="settingsPanel">
+            <div class="sp-title">Transaction Settings <span class="sp-close" id="settingsClose">✕</span></div>
             <div class="sp-label">SLIPPAGE TOLERANCE</div>
             <div class="sp-options">
               <button class="sp-opt" data-val="0.1">0.1%</button>
               <button class="sp-opt active" data-val="0.5">0.5%</button>
               <button class="sp-opt" data-val="1.0">1.0%</button>
             </div>
+            <div class="sp-custom">
+              <input type="text" id="customSlippage" inputmode="decimal" placeholder="Custom">
+              <span>%</span>
+            </div>
           </div>
         </div>
 
         <div class="token-box">
-          <div class="row1"><span>आप देंगे</span><span id="balanceFrom">Balance: 0.00</span></div>
+          <div class="row1"><span>You pay</span><span id="balanceFrom">Balance: 0.00</span></div>
           <div class="row2">
             <input type="text" class="amount-input mono" id="amountIn" placeholder="0.0" inputmode="decimal">
             <div class="token-select" id="fromTokenSelect"><span class="dot usdt"><svg viewBox="0 0 32 32" fill="white"><path d="M17.9 17.4v-.01c-.11.01-.68.04-1.95.04-1.01 0-1.72-.03-1.97-.04v.01c-3.9-.17-6.81-.85-6.81-1.66s2.91-1.49 6.81-1.66v2.65c.25.02.98.06 1.99.06 1.21 0 1.82-.05 1.93-.06v-2.65c3.89.17 6.79.85 6.79 1.66s-2.9 1.48-6.79 1.66m0-3.59v-2.37h5.43V7.5H8.56v3.94h5.43v2.37c-4.41.2-7.73 1.07-7.73 2.12s3.32 1.91 7.73 2.12v7.59h3.91v-7.59c4.4-.2 7.72-1.07 7.72-2.12s-3.32-1.91-7.72-2.12"/></svg></span>USDT</div>
           </div>
         </div>
 
-        <div class="swap-divider"><div class="swap-flip" id="flipBtn">⇅</div></div>
+        <div class="swap-divider"><div class="swap-flip" id="flipBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 10l5-6 5 6"></path>
+            <path d="M7 14l5 6 5-6"></path>
+          </svg>
+        </div></div>
 
         <div class="token-box">
-          <div class="row1"><span>आपको मिलेगा</span><span id="balanceTo">Balance: 0.00</span></div>
+          <div class="row1"><span>You receive</span><span id="balanceTo">Balance: 0.00</span></div>
           <div class="row2">
             <input type="text" class="amount-input mono" id="amountOut" placeholder="0.0" inputmode="decimal" disabled>
             <div class="token-select" id="toTokenSelect"><span class="dot znz"><img src="assets/shiba.png" alt="SHIB"></span>SHIB</div>
@@ -230,28 +264,47 @@
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var isMobile = window.innerWidth <= 640;
 
-  /* ---- settings panel (slippage) ---- */
+  /* ---- settings modal (slippage) ---- */
   const settingsBtn = document.getElementById('settingsBtn');
   const settingsPanel = document.getElementById('settingsPanel');
+  const settingsBackdrop = document.getElementById('settingsBackdrop');
+  const settingsClose = document.getElementById('settingsClose');
+  const customSlippageEl = document.getElementById('customSlippage');
   const slippageVal = document.getElementById('slippageVal');
+
+  function openSettings(){
+    settingsBtn.classList.add('open');
+    settingsPanel.classList.add('show');
+    settingsBackdrop.classList.add('show');
+  }
+  function closeSettings(){
+    settingsBtn.classList.remove('open');
+    settingsPanel.classList.remove('show');
+    settingsBackdrop.classList.remove('show');
+  }
 
   settingsBtn.addEventListener('click', (e) => {
     e.stopPropagation();
-    settingsBtn.classList.toggle('open');
-    settingsPanel.classList.toggle('show');
+    settingsPanel.classList.contains('show') ? closeSettings() : openSettings();
   });
-  document.addEventListener('click', (e) => {
-    if(!settingsPanel.contains(e.target) && e.target !== settingsBtn){
-      settingsBtn.classList.remove('open');
-      settingsPanel.classList.remove('show');
-    }
-  });
+  settingsClose.addEventListener('click', closeSettings);
+  settingsBackdrop.addEventListener('click', closeSettings);
+
   document.querySelectorAll('.sp-opt').forEach(opt => {
     opt.addEventListener('click', () => {
       document.querySelectorAll('.sp-opt').forEach(o => o.classList.remove('active'));
       opt.classList.add('active');
+      customSlippageEl.value = '';
       slippageVal.textContent = opt.dataset.val + '%';
     });
+  });
+
+  customSlippageEl.addEventListener('input', () => {
+    const val = parseFloat(customSlippageEl.value);
+    if(!isNaN(val) && val > 0 && val <= 50){
+      document.querySelectorAll('.sp-opt').forEach(o => o.classList.remove('active'));
+      slippageVal.textContent = val + '%';
+    }
   });
 
   /* ---- Reown AppKit wallet connect ---- */
@@ -428,6 +481,9 @@
   });
 
   flipBtn.addEventListener('click', () => {
+    flipBtn.classList.remove('spin');
+    void flipBtn.offsetWidth; // restart animation
+    flipBtn.classList.add('spin');
     direction = direction === 'USDT_TO_SHIB' ? 'SHIB_TO_USDT' : 'USDT_TO_SHIB';
     const fromSelect = document.getElementById('fromTokenSelect');
     const toSelect = document.getElementById('toTokenSelect');
@@ -443,20 +499,24 @@
   document.querySelectorAll('.sp-opt').forEach(opt => {
     opt.addEventListener('click', () => { slippagePercent = parseFloat(opt.dataset.val); });
   });
+  customSlippageEl.addEventListener('input', () => {
+    const val = parseFloat(customSlippageEl.value);
+    if(!isNaN(val) && val > 0 && val <= 50) slippagePercent = val;
+  });
 
-  /* ===== असली swap — deployed ZirakSwap contract को call करता है ===== */
+  /* ===== Real swap — calls the deployed ZirakSwap contract ===== */
   swapBtn.addEventListener('click', async () => {
     if(!walletAddress){
       if(appKitModal) appKitModal.open();
-      else alert('Wallet connect module अभी लोड हो रहा है, कुछ सेकंड बाद कोशिश करें।');
+      else alert('Wallet connect module is still loading, please try again in a few seconds.');
       return;
     }
     if(!signer || !ethersLib){
-      alert('Wallet signer तैयार नहीं है, कुछ सेकंड बाद कोशिश करें।');
+      alert('Wallet signer not ready yet, please try again in a few seconds.');
       return;
     }
     if(!amountInEl.value || Number(amountInEl.value) <= 0){
-      alert('कृपया amount डालें।');
+      alert('Please enter an amount.');
       return;
     }
 
