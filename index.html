@@ -81,7 +81,7 @@
   @keyframes pool-in{ from{ opacity:0; transform:translateY(-10px); } to{ opacity:1; transform:translateY(0); } }
   .card{
     position:relative; background:rgba(19,23,32,0.75); backdrop-filter:blur(18px);
-    border-radius:20px; padding:28px 20px; isolation:isolate;
+    border-radius:20px; padding:40px 20px; isolation:isolate;
     box-shadow:0 30px 70px -25px rgba(0,0,0,0.7);
   }
   .card::before{
@@ -93,7 +93,7 @@
   @keyframes chase{ to{ --ang:360deg; } }
   @property --ang{ syntax:'<angle>'; inherits:false; initial-value:0deg; }
 
-  .card-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; transform:translateZ(24px); }
+  .card-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:26px; transform:translateZ(24px); }
   .card-head h2{ font-size:18px; font-weight:700; }
   .settings-icon{ width:34px; height:34px; border-radius:9px; background:var(--surface-2); display:flex; align-items:center; justify-content:center; color:var(--muted); transition:color 0.2s, background 0.2s, transform 0.3s; position:relative; }
   .settings-icon:hover{ color:var(--teal); background:var(--surface); }
@@ -128,7 +128,7 @@
   .sp-custom input{ background:transparent; border:none; outline:none; color:var(--text); font-family:'JetBrains Mono'; font-size:13px; width:100%; }
   .sp-custom span{ color:var(--muted); font-family:'JetBrains Mono'; font-size:13px; }
 
-  .token-box{ background:var(--surface-2); border:1px solid transparent; border-radius:14px; padding:18px 15px; transition:border-color 0.2s, box-shadow 0.2s; transform:translateZ(20px); }
+  .token-box{ background:var(--surface-2); border:1px solid transparent; border-radius:14px; padding:24px 15px; transition:border-color 0.2s, box-shadow 0.2s; transform:translateZ(20px); }
   .token-box:focus-within{ border-color:rgba(45,212,191,0.45); box-shadow:0 0 0 3px rgba(45,212,191,0.1); }
   .token-box .row1{ display:flex; justify-content:space-between; align-items:center; margin-bottom:9px; }
   .token-box .row1 span{ font-size:11px; color:var(--muted); font-family:'JetBrains Mono'; }
@@ -170,13 +170,29 @@
   .rate-line b{ color:var(--text); font-weight:500; }
 
   .primary-btn{
-    width:100%; padding:16px; border-radius:13px; font-weight:700; font-size:15px; text-align:center;
-    transform:translateZ(24px); transition:opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+    width:100%; padding:16px; border-radius:13px; font-weight:800; font-size:15px; text-align:center;
+    background:linear-gradient(135deg, var(--teal), var(--violet)); color:#08110F;
+    box-shadow:0 5px 0 0 #1a8f80, 0 14px 30px -10px rgba(45,212,191,0.55);
+    transform:translateZ(24px) translateY(0);
+    transition:box-shadow 0.15s ease, transform 0.15s ease;
+    animation:btn-breathe 2.8s ease-in-out infinite;
   }
-  .primary-btn.pending{ background:var(--surface-2); color:var(--gold); border:1px dashed rgba(240,185,11,0.4); animation:btn-pulse 2.4s ease-in-out infinite; }
+  @keyframes btn-breathe{ 0%,100%{ transform:translateZ(24px) translateY(0) scale(1); } 50%{ transform:translateZ(24px) translateY(-2px) scale(1.012); } }
+  .primary-btn.pending{
+    background:var(--surface-2); color:var(--gold); border:1px dashed rgba(240,185,11,0.4);
+    box-shadow:none; animation:btn-pulse 2.4s ease-in-out infinite;
+  }
   @keyframes btn-pulse{ 0%,100%{ box-shadow:0 0 0 rgba(240,185,11,0); } 50%{ box-shadow:0 0 22px -4px rgba(240,185,11,0.35); } }
-  .primary-btn:hover{ box-shadow:0 14px 34px -14px rgba(240,185,11,0.5); transform:translateZ(24px) translateY(-2px); }
-  .primary-btn:active{ transform:translateZ(24px) translateY(0) scale(0.99); }
+  .primary-btn:not(.pending):hover{
+    box-shadow:0 7px 0 0 #1a8f80, 0 20px 40px -12px rgba(139,92,246,0.55);
+    transform:translateZ(24px) translateY(-4px) scale(1.015);
+    animation:none;
+  }
+  .primary-btn:not(.pending):active{
+    box-shadow:0 2px 0 0 #1a8f80, 0 6px 16px -8px rgba(45,212,191,0.5);
+    transform:translateZ(24px) translateY(3px) scale(0.985);
+    animation:none;
+  }
 
   footer{ position:relative; z-index:2; text-align:center; padding:16px 0 22px; }
   footer p{ color:var(--muted); font-size:10.5px; font-family:'JetBrains Mono'; letter-spacing:0.03em; }
