@@ -1,14 +1,26 @@
-# ZirakSwap — Single Contract
+# ZirakSwap — PancakeSwap-Routed (कोई अपनी liquidity नहीं चाहिए)
 
-सिर्फ **एक contract**: `contracts/ZirakSwap.sol` — fixed USDT ↔ SHIB pool, standard
-constant-product AMM (x*y=k), 0.3% trading fee। कोई Factory नहीं, कोई अलग Router नहीं —
-सब कुछ इसी एक file में है।
+एक contract: `contracts/ZirakSwap.sol`। ये अपना pool नहीं रखता — हर swap उसी
+transaction में PancakeSwap के **असली, पहले से भरे हुए** router को forward हो जाता है।
+आपको खुद USDT या SHIB liquidity कहीं भी जमा नहीं करनी।
+
+## कैसे काम करता है
+
+```
+User → ZirakSwap.swapUSDTForSHIB() 
+      → contract user se USDT khींचता है
+      → PancakeSwap Router ko exact amount approve karta hai
+      → PancakeSwap Router se swap करता है
+      → SHIB seedha user ke wallet mein wapas
+```
+
+सब कुछ **एक ही transaction** में — कहीं भी पैसा रुकता नहीं, ना contract के पास, ना किसी और के पास।
 
 ## ⚠️ Security
 
-- `.env` कभी GitHub पर push ना करें (`.gitignore` में पहले से protected है)
+- `.env` कभी GitHub पर push ना करें
 - Private key कभी chat/screenshot में share ना करें
-- पहले Testnet पर टेस्ट करें, mainnet पर बाद में
+- पहले Testnet पर टेस्ट करें (नोट: testnet पर real SHIB token मौजूद नहीं है — testnet सिर्फ contract logic टेस्ट करने के लिए, USDT/WBNB जैसी pair से)
 
 ## Steps
 
@@ -17,29 +29,24 @@ npm install
 cp .env.example .env
 nano .env          # PRIVATE_KEY aur BSCSCAN_API_KEY bharen
 npx hardhat compile
-npx hardhat run scripts/deploy.js --network bscTestnet
+npx hardhat run scripts/deploy.js --network bscMainnet
 ```
 
-Deploy होने के बाद जो **contract address** मिलेगा, वही एक address है जो frontend में
-`CONTRACT_ADDRESSES` में डालनी है।
+चूंकि real SHIB सिर्फ mainnet पर है, असली टेस्ट **mainnet पर छोटी amount से** करनी होगी (जैसे $1-2 का swap करके देखें कि सही से काम कर रहा है)।
 
-## Contract के functions (frontend इन्हें call करेगा)
+## Contract के functions
 
 | Function | काम |
 |---|---|
-| `addLiquidity(usdtAmt, shibAmt, minUsdt, minShib, deadline)` | Pool में liquidity डालना |
-| `removeLiquidity(liquidity, minUsdt, minShib, deadline)` | LP shares वापस भुनाना |
-| `swapUSDTForSHIB(usdtIn, minShibOut, deadline)` | USDT देकर SHIB लेना |
+| `swapUSDTForSHIB(usdtIn, minShibOut, deadline)` | USDT देकर SHIB लेना (PancakeSwap के ज़रिए) |
 | `swapSHIBForUSDT(shibIn, minUsdtOut, deadline)` | SHIB देकर USDT लेना |
-| `quoteUSDTToSHIB(usdtIn)` | कितना SHIB मिलेगा, बिना transaction भेजे |
-| `quoteSHIBToUSDT(shibIn)` | कितना USDT मिलेगा, बिना transaction भेजे |
+| `quoteUSDTToSHIB(usdtIn)` | अभी कितना SHIB मिलेगा — बिना transaction भेजे |
+| `quoteSHIBToUSDT(shibIn)` | अभी कितना USDT मिलेगा — बिना transaction भेजे |
 
-Swap से पहले user को token approve करना होगा — सिर्फ उतना जितना swap करना है,
-unlimited नहीं (ये MetaMask/wallet में normal दिखेगा, standard practice है)।
+Swap से पहले user को token approve करना होगा — सिर्फ उतना जितना swap करना है।
 
-## Mainnet पर जाना
+## Verify करना
 
 ```bash
-npx hardhat run scripts/deploy.js --network bscMainnet
-npx hardhat verify --network bscMainnet <CONTRACT_ADDRESS> <USDT_ADDRESS> <SHIB_ADDRESS>
+npx hardhat verify --network bscMainnet <CONTRACT_ADDRESS> <PANCAKE_ROUTER> <USDT_ADDRESS> <SHIB_ADDRESS>
 ```
