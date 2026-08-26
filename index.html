@@ -170,27 +170,48 @@
   .rate-line b{ color:var(--text); font-weight:500; }
 
   .primary-btn{
-    width:100%; padding:16px; border-radius:13px; font-weight:800; font-size:15px; text-align:center;
-    background:linear-gradient(135deg, var(--teal), var(--violet)); color:#08110F;
-    box-shadow:0 5px 0 0 #1a8f80, 0 14px 30px -10px rgba(45,212,191,0.55);
+    width:100%; padding:17px 22px; border-radius:999px; font-weight:800; font-size:15px; text-align:left;
+    background:linear-gradient(180deg, #F4FBF9 0%, #DCEFEA 55%, #CCE6DE 100%);
+    color:#0F3D33;
+    display:flex; align-items:center; justify-content:space-between; gap:14px;
+    box-shadow:
+      inset 0 1px 1px rgba(255,255,255,0.9),
+      inset 0 -3px 6px rgba(15,61,51,0.12),
+      0 10px 24px -10px rgba(0,0,0,0.5),
+      0 0 34px -6px rgba(45,212,191,0.55);
     transform:translateZ(24px) translateY(0);
     transition:box-shadow 0.15s ease, transform 0.15s ease;
     animation:btn-breathe 2.8s ease-in-out infinite;
   }
-  @keyframes btn-breathe{ 0%,100%{ transform:translateZ(24px) translateY(0) scale(1); } 50%{ transform:translateZ(24px) translateY(-2px) scale(1.012); } }
+  @keyframes btn-breathe{
+    0%,100%{ transform:translateZ(24px) translateY(0) scale(1);
+      box-shadow:inset 0 1px 1px rgba(255,255,255,0.9), inset 0 -3px 6px rgba(15,61,51,0.12), 0 10px 24px -10px rgba(0,0,0,0.5), 0 0 34px -6px rgba(45,212,191,0.55); }
+    50%{ transform:translateZ(24px) translateY(-2px) scale(1.012);
+      box-shadow:inset 0 1px 1px rgba(255,255,255,0.9), inset 0 -3px 6px rgba(15,61,51,0.12), 0 14px 30px -10px rgba(0,0,0,0.5), 0 0 50px -4px rgba(45,212,191,0.75); }
+  }
+  .primary-btn .btn-label{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .primary-btn .btn-dot{
+    flex-shrink:0; width:26px; height:26px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #7CFFD8, var(--teal) 65%, #0d9488 100%);
+    box-shadow:0 0 0 5px rgba(45,212,191,0.14), 0 0 18px 2px rgba(45,212,191,0.85);
+    animation:dot-pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes dot-pulse{ 0%,100%{ box-shadow:0 0 0 5px rgba(45,212,191,0.14), 0 0 18px 2px rgba(45,212,191,0.85); } 50%{ box-shadow:0 0 0 8px rgba(45,212,191,0.08), 0 0 26px 4px rgba(45,212,191,1); } }
+
   .primary-btn.pending{
     background:var(--surface-2); color:var(--gold); border:1px dashed rgba(240,185,11,0.4);
-    box-shadow:none; animation:btn-pulse 2.4s ease-in-out infinite;
+    box-shadow:none; animation:btn-pulse 2.4s ease-in-out infinite; justify-content:center;
   }
+  .primary-btn.pending .btn-dot{ display:none; }
   @keyframes btn-pulse{ 0%,100%{ box-shadow:0 0 0 rgba(240,185,11,0); } 50%{ box-shadow:0 0 22px -4px rgba(240,185,11,0.35); } }
   .primary-btn:not(.pending):hover{
-    box-shadow:0 7px 0 0 #1a8f80, 0 20px 40px -12px rgba(139,92,246,0.55);
     transform:translateZ(24px) translateY(-4px) scale(1.015);
+    box-shadow:inset 0 1px 1px rgba(255,255,255,0.9), inset 0 -3px 6px rgba(15,61,51,0.12), 0 18px 36px -10px rgba(0,0,0,0.55), 0 0 60px -2px rgba(139,92,246,0.5);
     animation:none;
   }
   .primary-btn:not(.pending):active{
-    box-shadow:0 2px 0 0 #1a8f80, 0 6px 16px -8px rgba(45,212,191,0.5);
-    transform:translateZ(24px) translateY(3px) scale(0.985);
+    transform:translateZ(24px) translateY(2px) scale(0.985);
+    box-shadow:inset 0 1px 1px rgba(255,255,255,0.9), inset 0 -2px 3px rgba(15,61,51,0.12), 0 6px 14px -8px rgba(0,0,0,0.5), 0 0 24px -4px rgba(45,212,191,0.5);
     animation:none;
   }
 
@@ -278,7 +299,10 @@
         <div class="rate-line"><span>Rate</span><b id="rateVal">1 USDT = — SHIB</b></div>
         <div class="rate-line"><span>Slippage</span><b id="slippageVal">0.5%</b></div>
 
-        <button class="primary-btn pending" id="swapBtn">Connect Wallet to Swap</button>
+        <button class="primary-btn pending" id="swapBtn">
+          <span class="btn-label" id="swapBtnLabel">Connect Wallet to Swap</span>
+          <span class="btn-dot"></span>
+        </button>
       </div>
     </div>
   </div>
@@ -437,13 +461,13 @@
 
   function updateSwapButtonLabel(){
     if(!walletAddress){
-      swapBtn.textContent = 'Connect Wallet to Swap';
+      document.getElementById('swapBtnLabel').textContent = 'Connect Wallet to Swap';
       swapBtn.classList.add('pending');
     } else if(!amountInEl.value || Number(amountInEl.value) <= 0){
-      swapBtn.textContent = 'Enter an amount';
+      document.getElementById('swapBtnLabel').textContent = 'Enter an amount';
       swapBtn.classList.add('pending');
     } else {
-      swapBtn.textContent = direction === 'USDT_TO_SHIB' ? 'Swap USDT → SHIB' : 'Swap SHIB → USDT';
+      document.getElementById('swapBtnLabel').textContent = direction === 'USDT_TO_SHIB' ? 'Swap USDT → SHIB' : 'Swap SHIB → USDT';
       swapBtn.classList.remove('pending');
     }
   }
@@ -564,7 +588,7 @@
     }
 
     const { inAddr, outAddr, inSym, outSym } = currentPair();
-    const originalLabel = swapBtn.textContent;
+    const originalLabel = document.getElementById('swapBtnLabel').textContent;
 
     try{
       const tokenIn = new ethersLib.Contract(inAddr, ERC20_ABI, signer);
@@ -583,13 +607,13 @@
       // 1) Allowance check karo, agar kam hai to approve karo
       const allowance = await tokenIn.allowance(walletAddress, ZIRAKSWAP_ADDRESS);
       if(allowance < amountInWei){
-        swapBtn.textContent = 'Approving ' + inSym + '...';
+        document.getElementById('swapBtnLabel').textContent = 'Approving ' + inSym + '...';
         const approveTx = await tokenIn.approve(ZIRAKSWAP_ADDRESS, amountInWei);
         await approveTx.wait();
       }
 
       // 2) Asli swap
-      swapBtn.textContent = 'Swapping...';
+      document.getElementById('swapBtnLabel').textContent = 'Swapping...';
       const zirakSwapWrite = new ethersLib.Contract(ZIRAKSWAP_ADDRESS, ZIRAKSWAP_ABI, signer);
       const deadline = Math.floor(Date.now() / 1000) + 60 * 20; // 20 minute deadline
 
@@ -597,10 +621,10 @@
         ? await zirakSwapWrite.swapUSDTForSHIB(amountInWei, minOut, deadline)
         : await zirakSwapWrite.swapSHIBForUSDT(amountInWei, minOut, deadline);
 
-      swapBtn.textContent = 'Confirming...';
+      document.getElementById('swapBtnLabel').textContent = 'Confirming...';
       await swapTx.wait();
 
-      swapBtn.textContent = '✓ Swap Successful';
+      document.getElementById('swapBtnLabel').textContent = '✓ Swap Successful';
       amountInEl.value = '';
       amountOutEl.value = '';
       refreshBalances();
@@ -609,7 +633,7 @@
       console.error('Swap error:', err);
       const msg = (err && err.shortMessage) ? err.shortMessage : 'Swap fail ho gaya, dobara try karen.';
       alert(msg);
-      swapBtn.textContent = originalLabel;
+      document.getElementById('swapBtnLabel').textContent = originalLabel;
     }
   });
 
