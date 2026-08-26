@@ -196,24 +196,24 @@
         </div>
 
         <div class="token-box">
-          <div class="row1"><span>आप देंगे</span><span>Balance: 0.00</span></div>
+          <div class="row1"><span>आप देंगे</span><span id="balanceFrom">Balance: 0.00</span></div>
           <div class="row2">
-            <input type="text" class="amount-input mono" placeholder="0.0" inputmode="decimal">
-            <div class="token-select"><span class="dot usdt"><svg viewBox="0 0 32 32" fill="white"><path d="M17.9 17.4v-.01c-.11.01-.68.04-1.95.04-1.01 0-1.72-.03-1.97-.04v.01c-3.9-.17-6.81-.85-6.81-1.66s2.91-1.49 6.81-1.66v2.65c.25.02.98.06 1.99.06 1.21 0 1.82-.05 1.93-.06v-2.65c3.89.17 6.79.85 6.79 1.66s-2.9 1.48-6.79 1.66m0-3.59v-2.37h5.43V7.5H8.56v3.94h5.43v2.37c-4.41.2-7.73 1.07-7.73 2.12s3.32 1.91 7.73 2.12v7.59h3.91v-7.59c4.4-.2 7.72-1.07 7.72-2.12s-3.32-1.91-7.72-2.12"/></svg></span>USDT</div>
+            <input type="text" class="amount-input mono" id="amountIn" placeholder="0.0" inputmode="decimal">
+            <div class="token-select" id="fromTokenSelect"><span class="dot usdt"><svg viewBox="0 0 32 32" fill="white"><path d="M17.9 17.4v-.01c-.11.01-.68.04-1.95.04-1.01 0-1.72-.03-1.97-.04v.01c-3.9-.17-6.81-.85-6.81-1.66s2.91-1.49 6.81-1.66v2.65c.25.02.98.06 1.99.06 1.21 0 1.82-.05 1.93-.06v-2.65c3.89.17 6.79.85 6.79 1.66s-2.9 1.48-6.79 1.66m0-3.59v-2.37h5.43V7.5H8.56v3.94h5.43v2.37c-4.41.2-7.73 1.07-7.73 2.12s3.32 1.91 7.73 2.12v7.59h3.91v-7.59c4.4-.2 7.72-1.07 7.72-2.12s-3.32-1.91-7.72-2.12"/></svg></span>USDT</div>
           </div>
         </div>
 
-        <div class="swap-divider"><div class="swap-flip">⇅</div></div>
+        <div class="swap-divider"><div class="swap-flip" id="flipBtn">⇅</div></div>
 
         <div class="token-box">
-          <div class="row1"><span>आपको मिलेगा</span><span>Balance: 0.00</span></div>
+          <div class="row1"><span>आपको मिलेगा</span><span id="balanceTo">Balance: 0.00</span></div>
           <div class="row2">
-            <input type="text" class="amount-input mono" placeholder="0.0" inputmode="decimal" disabled>
-            <div class="token-select"><span class="dot znz"><img src="assets/shiba.png" alt="SHIB"></span>SHIB</div>
+            <input type="text" class="amount-input mono" id="amountOut" placeholder="0.0" inputmode="decimal" disabled>
+            <div class="token-select" id="toTokenSelect"><span class="dot znz"><img src="assets/shiba.png" alt="SHIB"></span>SHIB</div>
           </div>
         </div>
 
-        <div class="rate-line"><span>Rate</span><b>1 USDT = — SHIB</b></div>
+        <div class="rate-line"><span>Rate</span><b id="rateVal">1 USDT = — SHIB</b></div>
         <div class="rate-line"><span>Slippage</span><b id="slippageVal">0.5%</b></div>
 
         <button class="primary-btn pending" id="swapBtn">Connect Wallet to Swap</button>
@@ -256,17 +256,52 @@
 
   /* ---- Reown AppKit wallet connect ---- */
   const swapBtn = document.getElementById('swapBtn');
+  const amountInEl = document.getElementById('amountIn');
+  const amountOutEl = document.getElementById('amountOut');
+  const rateValEl = document.getElementById('rateVal');
+  const balanceFromEl = document.getElementById('balanceFrom');
+  const balanceToEl = document.getElementById('balanceTo');
+  const flipBtn = document.getElementById('flipBtn');
+
   let walletAddress = null;
   let appKitModal = null;
+  let ethersProvider = null;
+  let signer = null;
+  let direction = 'USDT_TO_SHIB'; // ya 'SHIB_TO_USDT'
+  let slippagePercent = 0.5;
+
+  // ===== Deployed contract (BSC mainnet) =====
+  const ZIRAKSWAP_ADDRESS = '0x82403c4F7c762d7AC7CA35aE477a79c411533ae5';
+  const USDT_ADDRESS = '0x55d398326f99059fF775485246999027B3197955';
+  const SHIB_ADDRESS = '0x2859e4544C4bB03966803b044A93563Bd2D0DD4D';
+
+  const ZIRAKSWAP_ABI = [
+    'function swapUSDTForSHIB(uint256 usdtIn, uint256 minShibOut, uint256 deadline) returns (uint256)',
+    'function swapSHIBForUSDT(uint256 shibIn, uint256 minUsdtOut, uint256 deadline) returns (uint256)',
+    'function quoteUSDTToSHIB(uint256 usdtIn) view returns (uint256)',
+    'function quoteSHIBToUSDT(uint256 shibIn) view returns (uint256)'
+  ];
+  const ERC20_ABI = [
+    'function approve(address spender, uint256 value) returns (bool)',
+    'function allowance(address owner, address spender) view returns (uint256)',
+    'function balanceOf(address owner) view returns (uint256)',
+    'function decimals() view returns (uint8)'
+  ];
+
+  let ethersLib = null;
+  let quoteDebounce = null;
 
   // AppKit ko module ke roop me CDN se load karte hain
   (async function initAppKit(){
     try{
-      const { createAppKit, WagmiAdapter } = await import('https://cdn.jsdelivr.net/npm/@reown/appkit-cdn@latest/dist/appkit.js');
+      const [{ createAppKit, WagmiAdapter }, ethersMod] = await Promise.all([
+        import('https://cdn.jsdelivr.net/npm/@reown/appkit-cdn@latest/dist/appkit.js'),
+        import('https://cdn.jsdelivr.net/npm/ethers@6/+esm')
+      ]);
+      ethersLib = ethersMod;
 
       const projectId = '30c89e55db814cfd1d197f018b46d049';
 
-      // BNB Smart Chain network define kar rahe hain (PancakeSwap-style DEX ke liye)
       const bsc = {
         id: 56,
         name: 'BNB Smart Chain',
@@ -275,10 +310,7 @@
         blockExplorers: { default: { name: 'BscScan', url: 'https://bscscan.com' } }
       };
 
-      const wagmiAdapter = new WagmiAdapter({
-        networks: [bsc],
-        projectId
-      });
+      const wagmiAdapter = new WagmiAdapter({ networks: [bsc], projectId });
 
       appKitModal = createAppKit({
         adapters: [wagmiAdapter],
@@ -287,50 +319,195 @@
         metadata: {
           name: 'ZirakSwap',
           description: 'ZirakSwap Decentralized Exchange',
-          url: 'http://88.222.245.113',
+          url: 'http://digitalzirakpur.com',
           icons: ['https://avatars.githubusercontent.com/u/179229932']
         },
         themeMode: 'dark',
-        themeVariables: {
-          '--w3m-accent': '#2DD4BF',
-          '--w3m-border-radius-master': '2px'
-        },
+        themeVariables: { '--w3m-accent': '#2DD4BF', '--w3m-border-radius-master': '2px' },
         features: { analytics: true, email: false, socials: [] }
       });
 
-      // Wallet connect hone par address track karte hain
       appKitModal.subscribeAccount((account) => {
         if(account && account.isConnected && account.address){
           walletAddress = account.address;
-          swapBtn.textContent = 'Smart Contract जल्द जुड़ेगा';
-        }else{
+        } else {
           walletAddress = null;
-          swapBtn.textContent = 'Connect Wallet to Swap';
+          signer = null;
+        }
+        updateSwapButtonLabel();
+        refreshBalances();
+      });
+
+      // Jaise hi wallet connect ho, iske EIP-1193 provider se ethers signer banate hain
+      appKitModal.subscribeProviders((state) => {
+        const provider = state['eip155'];
+        if(provider && ethersLib){
+          ethersProvider = new ethersLib.BrowserProvider(provider);
+          ethersProvider.getSigner().then((s) => {
+            signer = s;
+            refreshBalances();
+          }).catch(() => {});
         }
       });
     }catch(err){
-      console.error('Reown AppKit load nahi hua:', err);
+      console.error('Reown AppKit / ethers load nahi hua:', err);
     }
   })();
 
-  /* =========================================================
-     ★★★ SMART CONTRACT INTEGRATION POINT ★★★
-     Deploy होने के बाद यहाँ router/factory address + ABI डालें
-     ========================================================= */
-  const CONTRACT_ADDRESSES = {
-    router:  "0x0000000000000000000000000000000000000000",
-    factory: "0x0000000000000000000000000000000000000000"
-  };
-  const ROUTER_ABI = [ /* TODO: paste Router ABI here */ ];
+  function updateSwapButtonLabel(){
+    if(!walletAddress){
+      swapBtn.textContent = 'Connect Wallet to Swap';
+      swapBtn.classList.add('pending');
+    } else if(!amountInEl.value || Number(amountInEl.value) <= 0){
+      swapBtn.textContent = 'Enter an amount';
+      swapBtn.classList.add('pending');
+    } else {
+      swapBtn.textContent = direction === 'USDT_TO_SHIB' ? 'Swap USDT → SHIB' : 'Swap SHIB → USDT';
+      swapBtn.classList.remove('pending');
+    }
+  }
 
-  swapBtn.addEventListener('click', () => {
+  function currentPair(){
+    return direction === 'USDT_TO_SHIB'
+      ? { inAddr: USDT_ADDRESS, outAddr: SHIB_ADDRESS, inSym: 'USDT', outSym: 'SHIB' }
+      : { inAddr: SHIB_ADDRESS, outAddr: USDT_ADDRESS, inSym: 'SHIB', outSym: 'USDT' };
+  }
+
+  async function refreshBalances(){
+    if(!signer || !walletAddress || !ethersLib) return;
+    try{
+      const { inAddr, outAddr } = currentPair();
+      const tokenIn = new ethersLib.Contract(inAddr, ERC20_ABI, ethersProvider);
+      const tokenOut = new ethersLib.Contract(outAddr, ERC20_ABI, ethersProvider);
+      const [decIn, decOut, balIn, balOut] = await Promise.all([
+        tokenIn.decimals(), tokenOut.decimals(),
+        tokenIn.balanceOf(walletAddress), tokenOut.balanceOf(walletAddress)
+      ]);
+      balanceFromEl.textContent = 'Balance: ' + Number(ethersLib.formatUnits(balIn, decIn)).toFixed(4);
+      balanceToEl.textContent = 'Balance: ' + Number(ethersLib.formatUnits(balOut, decOut)).toFixed(4);
+    }catch(err){ console.error('Balance fetch error:', err); }
+  }
+
+  async function updateQuote(){
+    const { inAddr, outAddr, inSym, outSym } = currentPair();
+    if(!amountInEl.value || Number(amountInEl.value) <= 0){
+      amountOutEl.value = '';
+      rateValEl.textContent = '1 ' + inSym + ' = — ' + outSym;
+      updateSwapButtonLabel();
+      return;
+    }
+    if(!ethersProvider || !ethersLib){ updateSwapButtonLabel(); return; }
+    try{
+      const tokenIn = new ethersLib.Contract(inAddr, ERC20_ABI, ethersProvider);
+      const decIn = await tokenIn.decimals();
+      const amountInWei = ethersLib.parseUnits(amountInEl.value, decIn);
+
+      const zirakSwap = new ethersLib.Contract(ZIRAKSWAP_ADDRESS, ZIRAKSWAP_ABI, ethersProvider);
+      const outWei = direction === 'USDT_TO_SHIB'
+        ? await zirakSwap.quoteUSDTToSHIB(amountInWei)
+        : await zirakSwap.quoteSHIBToUSDT(amountInWei);
+
+      const tokenOut = new ethersLib.Contract(outAddr, ERC20_ABI, ethersProvider);
+      const decOut = await tokenOut.decimals();
+      const outFormatted = ethersLib.formatUnits(outWei, decOut);
+
+      amountOutEl.value = Number(outFormatted).toFixed(6);
+      const rate = Number(outFormatted) / Number(amountInEl.value);
+      rateValEl.textContent = '1 ' + inSym + ' = ' + rate.toFixed(4) + ' ' + outSym;
+    }catch(err){
+      console.error('Quote error:', err);
+      rateValEl.textContent = '1 ' + inSym + ' = — ' + outSym;
+    }
+    updateSwapButtonLabel();
+  }
+
+  amountInEl.addEventListener('input', () => {
+    clearTimeout(quoteDebounce);
+    quoteDebounce = setTimeout(updateQuote, 400);
+    updateSwapButtonLabel();
+  });
+
+  flipBtn.addEventListener('click', () => {
+    direction = direction === 'USDT_TO_SHIB' ? 'SHIB_TO_USDT' : 'USDT_TO_SHIB';
+    const fromSelect = document.getElementById('fromTokenSelect');
+    const toSelect = document.getElementById('toTokenSelect');
+    const tmp = fromSelect.innerHTML;
+    fromSelect.innerHTML = toSelect.innerHTML;
+    toSelect.innerHTML = tmp;
+    amountInEl.value = '';
+    amountOutEl.value = '';
+    updateQuote();
+    refreshBalances();
+  });
+
+  document.querySelectorAll('.sp-opt').forEach(opt => {
+    opt.addEventListener('click', () => { slippagePercent = parseFloat(opt.dataset.val); });
+  });
+
+  /* ===== असली swap — deployed ZirakSwap contract को call करता है ===== */
+  swapBtn.addEventListener('click', async () => {
     if(!walletAddress){
       if(appKitModal) appKitModal.open();
       else alert('Wallet connect module अभी लोड हो रहा है, कुछ सेकंड बाद कोशिश करें।');
       return;
     }
-    alert('Smart contract अभी जुड़ा नहीं है। Router address और ABI जोड़ने के बाद यहाँ से असली swap काम करेगा।');
-    // TODO: ethers.js/web3.js से router.swapExactTokensForTokens() यहाँ कॉल होगा
+    if(!signer || !ethersLib){
+      alert('Wallet signer तैयार नहीं है, कुछ सेकंड बाद कोशिश करें।');
+      return;
+    }
+    if(!amountInEl.value || Number(amountInEl.value) <= 0){
+      alert('कृपया amount डालें।');
+      return;
+    }
+
+    const { inAddr, outAddr, inSym, outSym } = currentPair();
+    const originalLabel = swapBtn.textContent;
+
+    try{
+      const tokenIn = new ethersLib.Contract(inAddr, ERC20_ABI, signer);
+      const decIn = await tokenIn.decimals();
+      const amountInWei = ethersLib.parseUnits(amountInEl.value, decIn);
+
+      const zirakSwapRead = new ethersLib.Contract(ZIRAKSWAP_ADDRESS, ZIRAKSWAP_ABI, ethersProvider);
+      const quotedOut = direction === 'USDT_TO_SHIB'
+        ? await zirakSwapRead.quoteUSDTToSHIB(amountInWei)
+        : await zirakSwapRead.quoteSHIBToUSDT(amountInWei);
+
+      // slippage tolerance apply karte hain (jaise 0.5% => 99.5% guaranteed minimum)
+      const slippageBps = BigInt(Math.round(slippagePercent * 100)); // basis points
+      const minOut = quotedOut - (quotedOut * slippageBps / 10000n);
+
+      // 1) Allowance check karo, agar kam hai to approve karo
+      const allowance = await tokenIn.allowance(walletAddress, ZIRAKSWAP_ADDRESS);
+      if(allowance < amountInWei){
+        swapBtn.textContent = 'Approving ' + inSym + '...';
+        const approveTx = await tokenIn.approve(ZIRAKSWAP_ADDRESS, amountInWei);
+        await approveTx.wait();
+      }
+
+      // 2) Asli swap
+      swapBtn.textContent = 'Swapping...';
+      const zirakSwapWrite = new ethersLib.Contract(ZIRAKSWAP_ADDRESS, ZIRAKSWAP_ABI, signer);
+      const deadline = Math.floor(Date.now() / 1000) + 60 * 20; // 20 minute deadline
+
+      const swapTx = direction === 'USDT_TO_SHIB'
+        ? await zirakSwapWrite.swapUSDTForSHIB(amountInWei, minOut, deadline)
+        : await zirakSwapWrite.swapSHIBForUSDT(amountInWei, minOut, deadline);
+
+      swapBtn.textContent = 'Confirming...';
+      await swapTx.wait();
+
+      swapBtn.textContent = '✓ Swap Successful';
+      amountInEl.value = '';
+      amountOutEl.value = '';
+      refreshBalances();
+      setTimeout(() => { updateSwapButtonLabel(); }, 2500);
+    }catch(err){
+      console.error('Swap error:', err);
+      const msg = (err && err.shortMessage) ? err.shortMessage : 'Swap fail ho gaya, dobara try karen.';
+      alert(msg);
+      swapBtn.textContent = originalLabel;
+    }
   });
 
   /* ---- 3D tilt on swap card (desktop only) ---- */
