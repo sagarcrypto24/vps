@@ -133,30 +133,33 @@
   .settings-backdrop.show{ opacity:1; pointer-events:auto; }
 
   .settings-panel{
-    position:fixed; top:50%; left:50%; width:min(300px, 88vw); background:var(--surface); border:1px solid var(--line);
-    border-radius:16px; padding:20px; box-shadow:0 30px 70px -20px rgba(0,0,0,0.8); z-index:999;
+    position:fixed; top:50%; left:50%; width:min(300px, 88vw); background:#FFFFFF; border:1px solid rgba(0,0,0,0.08);
+    border-radius:16px; padding:20px; box-shadow:0 30px 70px -20px rgba(0,0,0,0.5); z-index:999;
     opacity:0; transform:translate(-50%,-50%) scale(0.94); pointer-events:none; transition:opacity 0.22s ease, transform 0.22s ease;
   }
   .settings-panel.show{ opacity:1; transform:translate(-50%,-50%) scale(1); pointer-events:auto; }
-  .settings-panel .sp-title{ font-family:'Space Grotesk'; font-size:17px; font-weight:700; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; }
-  .settings-panel .sp-close{ width:26px; height:26px; border-radius:7px; background:var(--surface-2); display:flex; align-items:center; justify-content:center; color:var(--muted); cursor:pointer; }
-  .settings-panel .sp-close:hover{ color:var(--text); }
-  .settings-panel .sp-label{ font-size:11px; color:var(--muted); font-family:'JetBrains Mono'; margin-bottom:9px; letter-spacing:0.03em; }
+  .settings-panel .sp-title{ font-family:'Space Grotesk'; font-size:17px; font-weight:700; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; color:#12151C; }
+  .settings-panel .sp-close{ width:26px; height:26px; border-radius:7px; background:#F0F2F5; display:flex; align-items:center; justify-content:center; color:#5B6472; cursor:pointer; }
+  .settings-panel .sp-close:hover{ color:#12151C; }
+  .settings-panel .sp-label{ font-size:11px; color:#8A93A6; font-family:'JetBrains Mono'; margin-bottom:9px; letter-spacing:0.03em; }
   .sp-options{ display:flex; gap:7px; margin-bottom:12px; }
   .sp-opt{
-    flex:1; background:var(--surface-2); border:1px solid transparent; color:var(--muted); font-family:'JetBrains Mono';
+    flex:1; background:#F0F2F5; border:1px solid transparent; color:#5B6472; font-family:'JetBrains Mono';
     font-size:13px; font-weight:600; padding:9px 0; border-radius:8px; transition:all 0.2s; text-align:center; cursor:pointer;
   }
-  .sp-opt.active{ background:rgba(45,212,191,0.14); border-color:var(--teal); color:var(--teal); }
-  .sp-opt:hover{ color:var(--text); }
-  .sp-custom{ display:flex; align-items:center; gap:8px; background:var(--surface-2); border:1px solid var(--line); border-radius:8px; padding:9px 12px; }
+  .sp-opt.active{ background:rgba(45,212,191,0.14); border-color:var(--teal); color:#0d9488; }
+  .sp-opt:hover{ color:#12151C; }
+  .sp-custom{ display:flex; align-items:center; gap:8px; background:#F0F2F5; border:1px solid rgba(0,0,0,0.08); border-radius:8px; padding:9px 12px; }
+  .sp-custom input{ color:#12151C; }
+  .sp-custom input::placeholder{ color:#9AA3B0; }
+  .sp-custom span{ color:#5B6472; }
 
-  .sp-row{ display:flex; align-items:center; justify-content:space-between; margin-top:18px; padding-top:16px; border-top:1px solid var(--line); }
-  .sp-row-label{ font-size:13px; font-weight:700; color:var(--text); }
+  .sp-row{ display:flex; align-items:center; justify-content:space-between; margin-top:18px; padding-top:16px; border-top:1px solid rgba(0,0,0,0.08); }
+  .sp-row-label{ font-size:13px; font-weight:700; color:#12151C; }
 
   .theme-toggle{
-    position:relative; width:60px; height:30px; border-radius:999px; background:var(--surface-2);
-    border:1px solid var(--line); cursor:pointer; flex-shrink:0; padding:2px;
+    position:relative; width:60px; height:30px; border-radius:999px; background:#F0F2F5;
+    border:1px solid rgba(0,0,0,0.08); cursor:pointer; flex-shrink:0; padding:2px;
   }
   .theme-toggle .tt-icon{
     position:absolute; top:0; bottom:0; width:26px; display:flex; align-items:center; justify-content:center;
@@ -326,31 +329,6 @@
               <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
             </svg>
           </div>
-          <div class="settings-backdrop" id="settingsBackdrop"></div>
-          <div class="settings-panel" id="settingsPanel">
-            <div class="sp-title">Transaction Settings <span class="sp-close" id="settingsClose">✕</span></div>
-            <div class="sp-label">SLIPPAGE TOLERANCE</div>
-            <div class="sp-options">
-              <button class="sp-opt" data-val="0.1">0.1%</button>
-              <button class="sp-opt active" data-val="0.5">0.5%</button>
-              <button class="sp-opt" data-val="1.0">1.0%</button>
-            </div>
-            <div class="sp-custom">
-              <input type="text" id="customSlippage" inputmode="decimal" placeholder="Custom">
-              <span>%</span>
-            </div>
-
-            <div class="sp-row">
-              <span class="sp-row-label" id="themeLabel">Dark mode</span>
-              <div class="theme-toggle" id="themeToggle">
-                <span class="tt-icon sun"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4"></circle><path stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></span>
-                <span class="tt-icon moon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.6A9 9 0 1 1 11.4 3a7 7 0 0 0 9.6 9.6Z"></path></svg></span>
-                <div class="tt-thumb">
-                  <svg id="ttThumbIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.6A9 9 0 1 1 11.4 3a7 7 0 0 0 9.6 9.6Z"></path></svg>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
 
         <div class="token-box">
@@ -402,6 +380,32 @@
     </div>
   </div>
 </main>
+
+<div class="settings-backdrop" id="settingsBackdrop"></div>
+<div class="settings-panel" id="settingsPanel">
+  <div class="sp-title">Transaction Settings <span class="sp-close" id="settingsClose">✕</span></div>
+  <div class="sp-label">SLIPPAGE TOLERANCE</div>
+  <div class="sp-options">
+    <button class="sp-opt" data-val="0.1">0.1%</button>
+    <button class="sp-opt active" data-val="0.5">0.5%</button>
+    <button class="sp-opt" data-val="1.0">1.0%</button>
+  </div>
+  <div class="sp-custom">
+    <input type="text" id="customSlippage" inputmode="decimal" placeholder="Custom">
+    <span>%</span>
+  </div>
+
+  <div class="sp-row">
+    <span class="sp-row-label" id="themeLabel">Dark mode</span>
+    <div class="theme-toggle" id="themeToggle">
+      <span class="tt-icon sun"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4"></circle><path stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></span>
+      <span class="tt-icon moon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.6A9 9 0 1 1 11.4 3a7 7 0 0 0 9.6 9.6Z"></path></svg></span>
+      <div class="tt-thumb">
+        <svg id="ttThumbIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.6A9 9 0 1 1 11.4 3a7 7 0 0 0 9.6 9.6Z"></path></svg>
+      </div>
+    </div>
+  </div>
+</div>
 
 <footer><p>ZIRAKSWAP · POWERED BY BLOCKCHAIN</p></footer>
 
