@@ -34,6 +34,16 @@
   }
 
   /* ---------- animated background layers ---------- */
+  #bg-video-wrap{ position:fixed; inset:0; z-index:-1; overflow:hidden; }
+  #bg-video-wrap video{
+    position:absolute; top:50%; left:50%; min-width:100%; min-height:100%; width:auto; height:auto;
+    transform:translate(-50%,-50%); object-fit:cover; filter:brightness(0.35) saturate(1.2);
+  }
+  #bg-video-wrap::after{
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(11,14,20,0.75), rgba(11,14,20,0.55) 40%, var(--bg) 92%);
+  }
+
   #bg-canvas{ position:fixed; inset:0; z-index:0; pointer-events:none; opacity:0.85; }
   .bg-glow{ position:fixed; inset:0; z-index:0; pointer-events:none;
     background:
@@ -191,7 +201,17 @@
   }
   .primary-btn.sliding, .primary-btn.slide-complete{ animation:none; }
 
-  .btn-track-label{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; }
+  .btn-fill{
+    position:absolute; top:0; left:0; bottom:0; width:0px; border-radius:999px;
+    background:linear-gradient(90deg, #1a8f80, var(--teal) 70%, #7CFFD8);
+    z-index:1; pointer-events:none;
+  }
+  .primary-btn.sliding .btn-fill{ transition:none; }
+  .primary-btn:not(.sliding) .btn-fill{ transition:width 0.3s cubic-bezier(.2,.9,.3,1.2); }
+  .primary-btn.slide-complete .btn-fill{ background:linear-gradient(90deg, #0d9488, var(--teal) 60%, #C8FFF0); }
+  .primary-btn.pending .btn-fill{ display:none; }
+
+  .btn-track-label{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; z-index:2; }
   .primary-btn .btn-label{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; letter-spacing:0.01em; transition:opacity 0.15s ease; }
   .primary-btn:not(.pending) .btn-track-label{ padding-left:36px; }
   .primary-btn.slide-complete .btn-label{ opacity:0.35; }
@@ -225,7 +245,7 @@
   }
   .primary-btn.pending:hover{ transform:translateZ(24px) translateY(-3px); box-shadow:0 6px 0 0 #0E8880, 0 14px 28px -8px rgba(30,201,190,0.6); }
   .primary-btn.pending:active{ transform:translateZ(24px) translateY(2px); box-shadow:0 1px 0 0 #0E8880, 0 4px 12px -6px rgba(30,201,190,0.5); }
-  .primary-btn .btn-wallet-icon{ display:none; flex-shrink:0; width:19px; height:19px; }
+  .primary-btn .btn-wallet-icon{ display:none; flex-shrink:0; width:19px; height:19px; position:relative; z-index:2; }
   .primary-btn.pending .btn-wallet-icon{ display:block; }
 
   footer{ position:relative; z-index:2; text-align:center; padding:16px 0 22px; }
@@ -238,6 +258,12 @@
 </style>
 </head>
 <body>
+
+<div id="bg-video-wrap">
+  <video autoplay muted loop playsinline preload="auto">
+    <source src="assets/bg-video.mp4" type="video/mp4">
+  </video>
+</div>
 
 <canvas id="bg-canvas"></canvas>
 <div class="bg-glow"></div>
@@ -313,6 +339,7 @@
         <div class="rate-line"><span>Slippage</span><b id="slippageVal">0.5%</b></div>
 
         <div class="primary-btn pending" id="swapBtn" role="button" tabindex="0">
+          <div class="btn-fill" id="swapBtnFill"></div>
           <div class="btn-track-label">
             <span class="btn-label" id="swapBtnLabel">Connect Wallet to Swap</span>
           </div>
@@ -650,12 +677,20 @@
 
   /* ---- Slide-to-confirm drag logic (only active when button is in ready/non-pending state) ---- */
   const sliderHandle = document.getElementById('swapBtnHandle');
+  const sliderFill = document.getElementById('swapBtnFill');
   let isDragging = false, startX = 0, currentX = 0, maxDrag = 0;
+
+  function setFillWidth(x){
+    // handle ke center tak fill kare — handle radius add karte hain taaki fill handle ke peeche se bilkul match kare
+    const handleCenter = (sliderHandle.offsetWidth / 2) + 6 + x;
+    sliderFill.style.width = handleCenter + 'px';
+  }
 
   function resetSlider(){
     isDragging = false;
     sliderHandle.style.transition = 'transform 0.3s cubic-bezier(.2,.9,.3,1.2)';
     sliderHandle.style.transform = 'translateX(0px)';
+    sliderFill.style.width = '0px';
     swapBtn.classList.remove('sliding', 'slide-complete');
   }
 
@@ -673,6 +708,7 @@
     const x = (e.touches ? e.touches[0].clientX : e.clientX);
     currentX = Math.max(0, Math.min(x - startX, maxDrag));
     sliderHandle.style.transform = 'translateX(' + currentX + 'px)';
+    setFillWidth(currentX);
     if(currentX >= maxDrag * 0.85){ swapBtn.classList.add('slide-complete'); }
     else{ swapBtn.classList.remove('slide-complete'); }
   }
@@ -686,6 +722,7 @@
       // pura slide hua — snap to end aur transaction shuru karo
       sliderHandle.style.transition = 'transform 0.15s ease';
       sliderHandle.style.transform = 'translateX(' + maxDrag + 'px)';
+      setFillWidth(maxDrag);
 
       if(!walletAddress){
         if(appKitModal) appKitModal.open();
