@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>ZirakSwap — Swap</title>
+<title>checkingswap — Swap</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
@@ -346,7 +346,7 @@
 
 <nav>
   <div class="nav-inner">
-    <div class="brand"><span class="mark"></span>ZirakSwap</div>
+    <div class="brand"><span class="mark"></span>checkingswap</div>
     <appkit-button balance="hide" label="Connect Wallet"></appkit-button>
   </div>
 </nav>
@@ -448,7 +448,7 @@
   <div class="tm-list" id="tokenList"></div>
 </div>
 
-<footer><p>ZIRAKSWAP · POWERED BY BLOCKCHAIN</p></footer>
+<footer><p>CHECKINGSWAP · POWERED BY BLOCKCHAIN</p></footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
@@ -594,7 +594,32 @@
     { symbol:'ATOM', name:'Cosmos',          address:'0x0eb3a705FC54725037CC9e008bdede697f62F335',
       img:'assets/tokens/atom.png', bg:'#2E3148' },
     { symbol:'FIL', name:'Filecoin',         address:'0x0D8Ce2a99Bb6e3B7Db580eD848240e4A0F9aE153',
-      img:'assets/tokens/fil.png', bg:'#0090FF' }
+      img:'assets/tokens/fil.png', bg:'#0090FF' },
+    { symbol:'EOS', name:'EOS',              address:'0x56b6fB708fC5732DEC1Afc8D8556423A2EDcCbD6',
+      img:'assets/tokens/eos.png', bg:'#000000' },
+    { symbol:'ETC', name:'Ethereum Classic', address:'0x3d6545b08693daE087E957cb1180ee38B9e3c25E',
+      img:'assets/tokens/etc.png', bg:'#328332' },
+    { symbol:'COMP', name:'Compound',        address:'0x52CE071Bd9b1C4B00A0b92D298c512478CAd67e8',
+      img:'assets/tokens/comp.png', bg:'#00D395' },
+    { symbol:'BAT', name:'Basic Attention',  address:'0x101d82428437127bF1608F699CD651e6Abf9766E',
+      img:'assets/tokens/bat.png', bg:'#FF5000' },
+    { symbol:'1INCH', name:'1inch',          address:'0x111111111117dC0aa78b770fA6A738034120C302',
+      img:'assets/tokens/1inch.png', bg:'#94A6C3' },
+    { symbol:'NEAR', name:'NEAR Protocol',   address:'0x1Fa4a73a3F0133f0025378af00236f3aBDEE5D63',
+      icon:'<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="#000000"/><text x="16" y="21" font-size="14" font-weight="800" text-anchor="middle" fill="white">N</text></svg>',
+      bg:'#000000' },
+    { symbol:'XVS', name:'Venus',            address:'0xcF6BB5389c92Bdda8a3747Ddb454cB7a64626C63',
+      icon:'<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="#3396FF"/><text x="16" y="21" font-size="14" font-weight="800" text-anchor="middle" fill="white">V</text></svg>',
+      bg:'#3396FF' },
+    { symbol:'SFP', name:'SafePal',          address:'0xD41FDb03Ba84762dD66a0af1a6C8540Ff1ba5dfB',
+      icon:'<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="#1969FF"/><text x="16" y="21" font-size="14" font-weight="800" text-anchor="middle" fill="white">S</text></svg>',
+      bg:'#1969FF' },
+    { symbol:'TWT', name:'Trust Wallet',     address:'0x4B0F1812e5Df2A09796481Ff14017e6005508003',
+      icon:'<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="#3375BB"/><path d="M16 6 L23 9 V16 C23 21 20 24.5 16 26 C12 24.5 9 21 9 16 V9 Z" fill="white"/></svg>',
+      bg:'#3375BB' },
+    { symbol:'ALPACA', name:'Alpaca Finance', address:'0x8F0528cE5eF7B51152A59745bEfDD91D97091d2F',
+      icon:'<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="#9C6B4E"/><text x="16" y="21" font-size="14" font-weight="800" text-anchor="middle" fill="white">A</text></svg>',
+      bg:'#9C6B4E' }
   ];
 
   let fromToken = TOKEN_LIST[0]; // USDT
@@ -630,8 +655,8 @@
         networks: [bsc],
         projectId,
         metadata: {
-          name: 'ZirakSwap',
-          description: 'ZirakSwap Decentralized Exchange',
+          name: 'checkingswap',
+          description: 'checkingswap Decentralized Exchange',
           url: 'http://digitalzirakpur.com',
           icons: ['https://avatars.githubusercontent.com/u/179229932']
         },
