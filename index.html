@@ -159,10 +159,10 @@
 
   /* ---------- TOKEN PICKER MODAL ---------- */
   .token-modal{
-    position:fixed; top:50%; left:50%; width:min(340px, 90vw); max-height:70vh; background:#FFFFFF;
+    position:fixed; top:38%; left:50%; width:min(340px, 90vw); max-height:66vh; background:#FFFFFF;
     border:1px solid rgba(0,0,0,0.08); border-radius:16px; padding:18px; box-shadow:0 30px 70px -20px rgba(0,0,0,0.5);
     z-index:999; opacity:0; transform:translate(-50%,-50%) scale(0.94); pointer-events:none;
-    transition:opacity 0.22s ease, transform 0.22s ease; display:flex; flex-direction:column;
+    transition:opacity 0.22s ease, transform 0.22s ease; display:flex; flex-direction:column; min-height:0;
   }
   .token-modal.show{ opacity:1; transform:translate(-50%,-50%) scale(1); pointer-events:auto; }
   .token-modal .tm-title{ font-family:'Space Grotesk'; font-size:17px; font-weight:700; color:#12151C; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-shrink:0; }
@@ -173,7 +173,7 @@
     font-family:'Inter'; font-size:14px; color:#12151C; outline:none; flex-shrink:0;
   }
   .tm-search::placeholder{ color:#9AA3B0; }
-  .tm-list{ overflow-y:auto; display:flex; flex-direction:column; gap:4px; }
+  .tm-list{ overflow-y:auto; display:flex; flex-direction:column; gap:4px; flex:1; min-height:0; }
   .tm-item{
     display:flex; align-items:center; gap:11px; padding:10px 8px; border-radius:10px; cursor:pointer;
     transition:background 0.15s ease; border:none; background:transparent; width:100%; text-align:left;
@@ -560,15 +560,26 @@
     { symbol:'SHIB', name:'Shiba Inu',       address:'0x2859e4544C4bB03966803b044A93563Bd2D0DD4D',
       img:'assets/shiba.png', bg:'#fff' },
     { symbol:'WBNB', name:'Wrapped BNB',     address:'0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
-      icon:'<span style="font-family:JetBrains Mono;font-size:11px">BNB</span>', bg:'#F0B90B' },
+      icon:'<svg viewBox="0 0 32 32" fill="white"><rect x="13" y="3" width="6" height="6" transform="rotate(45 16 6)"/><rect x="4" y="12" width="6" height="6" transform="rotate(45 7 15)"/><rect x="22" y="12" width="6" height="6" transform="rotate(45 25 15)"/><rect x="13" y="21" width="6" height="6" transform="rotate(45 16 24)"/><rect x="13" y="12" width="6" height="6" transform="rotate(45 16 15)"/></svg>',
+      bg:'#F0B90B' },
     { symbol:'BUSD', name:'Binance USD',     address:'0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56',
-      icon:'<span style="font-family:JetBrains Mono;font-size:10px">BUSD</span>', bg:'#F0B90B' },
+      icon:'<svg viewBox="0 0 32 32" fill="white"><rect x="13" y="3" width="6" height="6" transform="rotate(45 16 6)"/><rect x="4" y="12" width="6" height="6" transform="rotate(45 7 15)"/><rect x="22" y="12" width="6" height="6" transform="rotate(45 25 15)"/><rect x="13" y="21" width="6" height="6" transform="rotate(45 16 24)"/><text x="16" y="19" font-size="9" font-weight="800" text-anchor="middle" fill="#F0B90B">$</text></svg>',
+      bg:'#F0B90B' },
     { symbol:'USDC', name:'USD Coin',        address:'0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d',
-      icon:'<span style="font-family:JetBrains Mono;font-size:10px">USDC</span>', bg:'#2775CA' },
+      icon:'<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="#2775CA"/><text x="16" y="21" font-size="15" font-weight="800" text-anchor="middle" fill="white">$</text></svg>',
+      bg:'#2775CA' },
     { symbol:'BTCB', name:'Bitcoin BEP20',   address:'0x7130d2A12B9BCbFAe4f2634d864A1Ee1ce3Ead9c',
-      icon:'<span style="font-family:JetBrains Mono;font-size:10px">BTC</span>', bg:'#F7931A' },
+      icon:'<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="#F7931A"/><text x="16" y="21" font-size="16" font-weight="800" text-anchor="middle" fill="white">₿</text></svg>',
+      bg:'#F7931A' },
     { symbol:'CAKE', name:'PancakeSwap',     address:'0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82',
-      icon:'<span style="font-family:JetBrains Mono;font-size:10px">CAKE</span>', bg:'#8B5CF6' }
+      icon:'<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="#1FC7D4"/><ellipse cx="16" cy="21" rx="8" ry="2.4" fill="#FBD394"/><ellipse cx="16" cy="17.2" rx="7" ry="2.2" fill="#FCDDA9"/><ellipse cx="16" cy="13.6" rx="6" ry="2" fill="#FEEAC4"/><circle cx="16" cy="11" r="1.6" fill="#7B4B1E"/></svg>',
+      bg:'#1FC7D4' },
+    { symbol:'ETH', name:'Ethereum',         address:'0x2170Ed0880ac9A755fd29B2688956BD959F933F8',
+      icon:'<svg viewBox="0 0 32 32" fill="white"><path d="M16 4 L23.5 16.2 L16 20.5 L8.5 16.2 Z" opacity="0.7"/><path d="M16 22 L23.5 17.7 L16 28 L8.5 17.7 Z"/></svg>',
+      bg:'#627EEA' },
+    { symbol:'XRP', name:'Ripple',           address:'0x1D2F0da169ceB9fC7B3144628dB156f3F6c60dBE',
+      icon:'<svg viewBox="0 0 32 32" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M7 9c2 4 5 6 9 6s7-2 9-6"/><path d="M7 23c2-4 5-6 9-6s7 2 9 6"/></svg>',
+      bg:'#23292F' }
   ];
 
   let fromToken = TOKEN_LIST[0]; // USDT
