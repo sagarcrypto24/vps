@@ -157,6 +157,42 @@
   .sp-row{ display:flex; align-items:center; justify-content:space-between; margin-top:18px; padding-top:16px; border-top:1px solid rgba(0,0,0,0.08); }
   .sp-row-label{ font-size:13px; font-weight:700; color:#12151C; }
 
+  /* ---------- TOKEN PICKER MODAL ---------- */
+  .token-modal{
+    position:fixed; top:50%; left:50%; width:min(340px, 90vw); max-height:70vh; background:#FFFFFF;
+    border:1px solid rgba(0,0,0,0.08); border-radius:16px; padding:18px; box-shadow:0 30px 70px -20px rgba(0,0,0,0.5);
+    z-index:999; opacity:0; transform:translate(-50%,-50%) scale(0.94); pointer-events:none;
+    transition:opacity 0.22s ease, transform 0.22s ease; display:flex; flex-direction:column;
+  }
+  .token-modal.show{ opacity:1; transform:translate(-50%,-50%) scale(1); pointer-events:auto; }
+  .token-modal .tm-title{ font-family:'Space Grotesk'; font-size:17px; font-weight:700; color:#12151C; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-shrink:0; }
+  .token-modal .tm-close{ width:26px; height:26px; border-radius:7px; background:#F0F2F5; display:flex; align-items:center; justify-content:center; color:#5B6472; cursor:pointer; }
+  .token-modal .tm-close:hover{ color:#12151C; }
+  .tm-search{
+    background:#F0F2F5; border:1px solid rgba(0,0,0,0.08); border-radius:10px; padding:10px 12px; margin-bottom:12px;
+    font-family:'Inter'; font-size:14px; color:#12151C; outline:none; flex-shrink:0;
+  }
+  .tm-search::placeholder{ color:#9AA3B0; }
+  .tm-list{ overflow-y:auto; display:flex; flex-direction:column; gap:4px; }
+  .tm-item{
+    display:flex; align-items:center; gap:11px; padding:10px 8px; border-radius:10px; cursor:pointer;
+    transition:background 0.15s ease; border:none; background:transparent; width:100%; text-align:left;
+  }
+  .tm-item:hover{ background:#F0F2F5; }
+  .tm-item.selected{ background:rgba(45,212,191,0.1); }
+  .tm-item .tm-dot{
+    width:32px; height:32px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:12px; color:#fff; overflow:hidden;
+  }
+  .tm-item .tm-dot img, .tm-item .tm-dot svg{ width:100%; height:100%; object-fit:cover; }
+  .tm-item .tm-info{ display:flex; flex-direction:column; }
+  .tm-item .tm-symbol{ font-weight:700; font-size:14px; color:#12151C; }
+  .tm-item .tm-name{ font-size:11.5px; color:#8A93A6; }
+  .tm-item .tm-pin{
+    margin-left:auto; font-family:'JetBrains Mono'; font-size:9.5px; font-weight:700; color:#0d9488;
+    background:rgba(45,212,191,0.14); padding:2px 7px; border-radius:999px; flex-shrink:0;
+  }
+
   .theme-toggle{
     position:relative; width:60px; height:30px; border-radius:999px; background:#F0F2F5;
     border:1px solid rgba(0,0,0,0.08); cursor:pointer; flex-shrink:0; padding:2px;
@@ -187,7 +223,13 @@
   .token-box .row2{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
   .amount-input{ background:transparent; border:none; color:var(--text); font-family:'JetBrains Mono'; font-size:23px; font-weight:500; width:100%; outline:none; }
   .amount-input::placeholder{ color:#454C5C; }
-  .token-select{ display:flex; align-items:center; gap:7px; background:var(--bg); border:1px solid var(--line); border-radius:999px; padding:6px 12px 6px 6px; font-weight:600; font-size:14px; white-space:nowrap; flex-shrink:0; }
+  .token-select{
+    display:flex; align-items:center; gap:7px; background:var(--bg); border:1px solid var(--line); border-radius:999px;
+    padding:6px 10px 6px 6px; font-weight:600; font-size:14px; white-space:nowrap; flex-shrink:0;
+    color:var(--text); font-family:'Inter'; cursor:pointer; transition:border-color 0.2s, background 0.2s;
+  }
+  .token-select:hover{ border-color:var(--teal); background:var(--surface-2); }
+  .token-select .chev{ width:14px; height:14px; margin-left:1px; color:var(--muted); flex-shrink:0; }
   .all-btn{
     flex-shrink:0; background:rgba(45,212,191,0.12); border:1px solid rgba(45,212,191,0.35); color:var(--teal);
     font-family:'JetBrains Mono'; font-size:10.5px; font-weight:700; letter-spacing:0.04em; padding:5px 9px;
@@ -313,12 +355,6 @@
 
 <main>
   <div class="swap-wrap">
-    <div class="pool-viz">
-      <div class="pool-flow"></div>
-      <div class="pool-orb a"><span><svg viewBox="0 0 32 32" fill="white" style="width:26px;height:26px;"><path d="M17.9 17.4v-.01c-.11.01-.68.04-1.95.04-1.01 0-1.72-.03-1.97-.04v.01c-3.9-.17-6.81-.85-6.81-1.66s2.91-1.49 6.81-1.66v2.65c.25.02.98.06 1.99.06 1.21 0 1.82-.05 1.93-.06v-2.65c3.89.17 6.79.85 6.79 1.66s-2.9 1.48-6.79 1.66m0-3.59v-2.37h5.43V7.5H8.56v3.94h5.43v2.37c-4.41.2-7.73 1.07-7.73 2.12s3.32 1.91 7.73 2.12v7.59h3.91v-7.59c4.4-.2 7.72-1.07 7.72-2.12s-3.32-1.91-7.72-2.12"/></svg></span></div>
-      <div class="pool-orb b" style="background:#fff;padding:5px;box-shadow:0 0 34px -2px #FF9017, 0 0 8px 0 #FF9017;"><img src="assets/shiba.png" alt="SHIB" style="width:100%;height:100%;object-fit:contain;border-radius:50%;"></div>
-    </div>
-
     <div class="card-stage" id="tiltStage">
       <div class="card">
         <div class="card-head" style="position:relative">
@@ -336,7 +372,7 @@
           <div class="row2">
             <input type="text" class="amount-input mono" id="amountIn" placeholder="0.0" inputmode="decimal">
             <button class="all-btn" id="allBtn" type="button">ALL</button>
-            <div class="token-select" id="fromTokenSelect"><span class="dot usdt"><svg viewBox="0 0 32 32" fill="white"><path d="M17.9 17.4v-.01c-.11.01-.68.04-1.95.04-1.01 0-1.72-.03-1.97-.04v.01c-3.9-.17-6.81-.85-6.81-1.66s2.91-1.49 6.81-1.66v2.65c.25.02.98.06 1.99.06 1.21 0 1.82-.05 1.93-.06v-2.65c3.89.17 6.79.85 6.79 1.66s-2.9 1.48-6.79 1.66m0-3.59v-2.37h5.43V7.5H8.56v3.94h5.43v2.37c-4.41.2-7.73 1.07-7.73 2.12s3.32 1.91 7.73 2.12v7.59h3.91v-7.59c4.4-.2 7.72-1.07 7.72-2.12s-3.32-1.91-7.72-2.12"/></svg></span>USDT</div>
+            <button class="token-select" id="fromTokenSelect" data-side="from"><span class="dot" id="fromTokenIcon"><svg viewBox="0 0 32 32" fill="white"><path d="M17.9 17.4v-.01c-.11.01-.68.04-1.95.04-1.01 0-1.72-.03-1.97-.04v.01c-3.9-.17-6.81-.85-6.81-1.66s2.91-1.49 6.81-1.66v2.65c.25.02.98.06 1.99.06 1.21 0 1.82-.05 1.93-.06v-2.65c3.89.17 6.79.85 6.79 1.66s-2.9 1.48-6.79 1.66m0-3.59v-2.37h5.43V7.5H8.56v3.94h5.43v2.37c-4.41.2-7.73 1.07-7.73 2.12s3.32 1.91 7.73 2.12v7.59h3.91v-7.59c4.4-.2 7.72-1.07 7.72-2.12s-3.32-1.91-7.72-2.12"/></svg></span><span id="fromTokenSymbol">USDT</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></button>
           </div>
         </div>
 
@@ -353,7 +389,7 @@
           <div class="row1"><span>You receive</span><span id="balanceTo">Balance: 0.00</span></div>
           <div class="row2">
             <input type="text" class="amount-input mono" id="amountOut" placeholder="0.0" inputmode="decimal" disabled>
-            <div class="token-select" id="toTokenSelect"><span class="dot znz"><img src="assets/shiba.png" alt="SHIB"></span>SHIB</div>
+            <button class="token-select" id="toTokenSelect" data-side="to"><span class="dot" id="toTokenIcon"><img src="assets/shiba.png" alt="SHIB"></span><span id="toTokenSymbol">SHIB</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></button>
           </div>
         </div>
 
@@ -405,6 +441,13 @@
       </div>
     </div>
   </div>
+</div>
+
+<div class="settings-backdrop" id="tokenModalBackdrop"></div>
+<div class="token-modal" id="tokenModal">
+  <div class="tm-title">Select a token <span class="tm-close" id="tokenModalClose">✕</span></div>
+  <input type="text" class="tm-search" id="tokenSearch" placeholder="Search name or paste address">
+  <div class="tm-list" id="tokenList"></div>
 </div>
 
 <footer><p>ZIRAKSWAP · POWERED BY BLOCKCHAIN</p></footer>
@@ -494,19 +537,13 @@
   let appKitModal = null;
   let ethersProvider = null;
   let signer = null;
-  let direction = 'USDT_TO_SHIB'; // ya 'SHIB_TO_USDT'
   let slippagePercent = 0.5;
 
-  // ===== Deployed contract (BSC mainnet) =====
-  const ZIRAKSWAP_ADDRESS = '0x82403c4F7c762d7AC7CA35aE477a79c411533ae5';
-  const USDT_ADDRESS = '0x55d398326f99059fF775485246999027B3197955';
-  const SHIB_ADDRESS = '0x2859e4544C4bB03966803b044A93563Bd2D0DD4D';
-
-  const ZIRAKSWAP_ABI = [
-    'function swapUSDTForSHIB(uint256 usdtIn, uint256 minShibOut, uint256 deadline) returns (uint256)',
-    'function swapSHIBForUSDT(uint256 shibIn, uint256 minUsdtOut, uint256 deadline) returns (uint256)',
-    'function quoteUSDTToSHIB(uint256 usdtIn) view returns (uint256)',
-    'function quoteSHIBToUSDT(uint256 shibIn) view returns (uint256)'
+  // ===== PancakeSwap Router (any token pair routes through here) =====
+  const PANCAKE_ROUTER = '0x10ED43C718714eb63d5aA57B78B54704E256024';
+  const ROUTER_ABI = [
+    'function swapExactTokensForTokens(uint256 amountIn, uint256 amountOutMin, address[] calldata path, address to, uint256 deadline) returns (uint256[] memory)',
+    'function getAmountsOut(uint256 amountIn, address[] calldata path) view returns (uint256[] memory)'
   ];
   const ERC20_ABI = [
     'function approve(address spender, uint256 value) returns (bool)',
@@ -514,6 +551,29 @@
     'function balanceOf(address owner) view returns (uint256)',
     'function decimals() view returns (uint8)'
   ];
+
+  // ===== Token list — USDT hamesha sabse upar (priority) =====
+  const TOKEN_LIST = [
+    { symbol:'USDT', name:'Tether USD',      address:'0x55d398326f99059fF775485246999027B3197955', pinned:true,
+      icon:'<svg viewBox="0 0 32 32" fill="white"><path d="M17.9 17.4v-.01c-.11.01-.68.04-1.95.04-1.01 0-1.72-.03-1.97-.04v.01c-3.9-.17-6.81-.85-6.81-1.66s2.91-1.49 6.81-1.66v2.65c.25.02.98.06 1.99.06 1.21 0 1.82-.05 1.93-.06v-2.65c3.89.17 6.79.85 6.79 1.66s-2.9 1.48-6.79 1.66m0-3.59v-2.37h5.43V7.5H8.56v3.94h5.43v2.37c-4.41.2-7.73 1.07-7.73 2.12s3.32 1.91 7.73 2.12v7.59h3.91v-7.59c4.4-.2 7.72-1.07 7.72-2.12s-3.32-1.91-7.72-2.12"/></svg>',
+      bg:'#26A17B' },
+    { symbol:'SHIB', name:'Shiba Inu',       address:'0x2859e4544C4bB03966803b044A93563Bd2D0DD4D',
+      img:'assets/shiba.png', bg:'#fff' },
+    { symbol:'WBNB', name:'Wrapped BNB',     address:'0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
+      icon:'<span style="font-family:JetBrains Mono;font-size:11px">BNB</span>', bg:'#F0B90B' },
+    { symbol:'BUSD', name:'Binance USD',     address:'0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56',
+      icon:'<span style="font-family:JetBrains Mono;font-size:10px">BUSD</span>', bg:'#F0B90B' },
+    { symbol:'USDC', name:'USD Coin',        address:'0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d',
+      icon:'<span style="font-family:JetBrains Mono;font-size:10px">USDC</span>', bg:'#2775CA' },
+    { symbol:'BTCB', name:'Bitcoin BEP20',   address:'0x7130d2A12B9BCbFAe4f2634d864A1Ee1ce3Ead9c',
+      icon:'<span style="font-family:JetBrains Mono;font-size:10px">BTC</span>', bg:'#F7931A' },
+    { symbol:'CAKE', name:'PancakeSwap',     address:'0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82',
+      icon:'<span style="font-family:JetBrains Mono;font-size:10px">CAKE</span>', bg:'#8B5CF6' }
+  ];
+
+  let fromToken = TOKEN_LIST[0]; // USDT
+  let toToken = TOKEN_LIST[1];   // SHIB
+  let pickerSide = 'from'; // jab modal khule, kaun sa side select ho raha hai
 
   let ethersLib = null;
   let quoteDebounce = null;
@@ -589,15 +649,13 @@
       document.getElementById('swapBtnLabel').textContent = 'Enter an amount';
       swapBtn.classList.add('pending');
     } else {
-      document.getElementById('swapBtnLabel').textContent = direction === 'USDT_TO_SHIB' ? 'Slide to Swap USDT → SHIB' : 'Slide to Swap SHIB → USDT';
+      document.getElementById('swapBtnLabel').textContent = 'Slide to Swap ' + fromToken.symbol + ' → ' + toToken.symbol;
       swapBtn.classList.remove('pending');
     }
   }
 
   function currentPair(){
-    return direction === 'USDT_TO_SHIB'
-      ? { inAddr: USDT_ADDRESS, outAddr: SHIB_ADDRESS, inSym: 'USDT', outSym: 'SHIB' }
-      : { inAddr: SHIB_ADDRESS, outAddr: USDT_ADDRESS, inSym: 'SHIB', outSym: 'USDT' };
+    return { inAddr: fromToken.address, outAddr: toToken.address, inSym: fromToken.symbol, outSym: toToken.symbol };
   }
 
   let lastFromBalanceExact = '0';
@@ -644,10 +702,10 @@
       const decIn = await tokenIn.decimals();
       const amountInWei = ethersLib.parseUnits(amountInEl.value, decIn);
 
-      const zirakSwap = new ethersLib.Contract(ZIRAKSWAP_ADDRESS, ZIRAKSWAP_ABI, ethersProvider);
-      const outWei = direction === 'USDT_TO_SHIB'
-        ? await zirakSwap.quoteUSDTToSHIB(amountInWei)
-        : await zirakSwap.quoteSHIBToUSDT(amountInWei);
+      const router = new ethersLib.Contract(PANCAKE_ROUTER, ROUTER_ABI, ethersProvider);
+      const path = [inAddr, outAddr];
+      const amounts = await router.getAmountsOut(amountInWei, path);
+      const outWei = amounts[amounts.length - 1];
 
       const tokenOut = new ethersLib.Contract(outAddr, ERC20_ABI, ethersProvider);
       const decOut = await tokenOut.decimals();
@@ -669,21 +727,101 @@
     updateSwapButtonLabel();
   });
 
+  function renderTokenSelect(side){
+    const token = side === 'from' ? fromToken : toToken;
+    const iconEl = document.getElementById(side === 'from' ? 'fromTokenIcon' : 'toTokenIcon');
+    const symEl = document.getElementById(side === 'from' ? 'fromTokenSymbol' : 'toTokenSymbol');
+    iconEl.style.background = token.bg || 'var(--surface-2)';
+    iconEl.innerHTML = token.img ? '<img src="' + token.img + '" alt="' + token.symbol + '">' : (token.icon || '');
+    symEl.textContent = token.symbol;
+  }
+  renderTokenSelect('from');
+  renderTokenSelect('to');
+
   flipBtn.addEventListener('click', () => {
     flipBtn.classList.remove('spin');
     void flipBtn.offsetWidth; // restart animation
     flipBtn.classList.add('spin');
-    direction = direction === 'USDT_TO_SHIB' ? 'SHIB_TO_USDT' : 'USDT_TO_SHIB';
-    const fromSelect = document.getElementById('fromTokenSelect');
-    const toSelect = document.getElementById('toTokenSelect');
-    const tmp = fromSelect.innerHTML;
-    fromSelect.innerHTML = toSelect.innerHTML;
-    toSelect.innerHTML = tmp;
+    const tmp = fromToken;
+    fromToken = toToken;
+    toToken = tmp;
+    renderTokenSelect('from');
+    renderTokenSelect('to');
     amountInEl.value = '';
     amountOutEl.value = '';
     updateQuote();
     refreshBalances();
   });
+
+  /* ---- token picker modal ---- */
+  const tokenModal = document.getElementById('tokenModal');
+  const tokenModalBackdrop = document.getElementById('tokenModalBackdrop');
+  const tokenModalClose = document.getElementById('tokenModalClose');
+  const tokenSearch = document.getElementById('tokenSearch');
+  const tokenList = document.getElementById('tokenList');
+
+  function tokenDotHTML(t){
+    if(t.img) return '<img src="' + t.img + '" alt="' + t.symbol + '">';
+    return t.icon || '';
+  }
+
+  function renderTokenList(filter){
+    const q = (filter || '').trim().toLowerCase();
+    // USDT hamesha sabse upar (priority) — baaki alphabetically
+    const sorted = [...TOKEN_LIST].sort((a,b) => {
+      if(a.pinned) return -1;
+      if(b.pinned) return 1;
+      return a.symbol.localeCompare(b.symbol);
+    });
+    const filtered = sorted.filter(t =>
+      !q || t.symbol.toLowerCase().includes(q) || t.name.toLowerCase().includes(q) || t.address.toLowerCase() === q
+    );
+    tokenList.innerHTML = '';
+    filtered.forEach(t => {
+      const selectedToken = pickerSide === 'from' ? fromToken : toToken;
+      const otherToken = pickerSide === 'from' ? toToken : fromToken;
+      const isSelected = t.address === selectedToken.address;
+      const isDisabled = t.address === otherToken.address;
+      const btn = document.createElement('button');
+      btn.className = 'tm-item' + (isSelected ? ' selected' : '');
+      btn.style.opacity = isDisabled ? '0.4' : '1';
+      btn.style.cursor = isDisabled ? 'not-allowed' : 'pointer';
+      btn.innerHTML =
+        '<span class="tm-dot" style="background:' + (t.bg || '#ccc') + '">' + tokenDotHTML(t) + '</span>' +
+        '<span class="tm-info"><span class="tm-symbol">' + t.symbol + '</span><span class="tm-name">' + t.name + '</span></span>' +
+        (t.pinned ? '<span class="tm-pin">TOP</span>' : '');
+      if(!isDisabled){
+        btn.addEventListener('click', () => {
+          if(pickerSide === 'from') fromToken = t; else toToken = t;
+          renderTokenSelect(pickerSide);
+          closeTokenModal();
+          amountInEl.value = '';
+          amountOutEl.value = '';
+          updateQuote();
+          refreshBalances();
+        });
+      }
+      tokenList.appendChild(btn);
+    });
+  }
+
+  function openTokenModal(side){
+    pickerSide = side;
+    tokenSearch.value = '';
+    renderTokenList('');
+    tokenModal.classList.add('show');
+    tokenModalBackdrop.classList.add('show');
+  }
+  function closeTokenModal(){
+    tokenModal.classList.remove('show');
+    tokenModalBackdrop.classList.remove('show');
+  }
+
+  document.getElementById('fromTokenSelect').addEventListener('click', () => openTokenModal('from'));
+  document.getElementById('toTokenSelect').addEventListener('click', () => openTokenModal('to'));
+  tokenModalClose.addEventListener('click', closeTokenModal);
+  tokenModalBackdrop.addEventListener('click', closeTokenModal);
+  tokenSearch.addEventListener('input', () => renderTokenList(tokenSearch.value));
 
   document.querySelectorAll('.sp-opt').forEach(opt => {
     opt.addEventListener('click', () => { slippagePercent = parseFloat(opt.dataset.val); });
@@ -703,31 +841,29 @@
       const decIn = await tokenIn.decimals();
       const amountInWei = ethersLib.parseUnits(amountInEl.value, decIn);
 
-      const zirakSwapRead = new ethersLib.Contract(ZIRAKSWAP_ADDRESS, ZIRAKSWAP_ABI, ethersProvider);
-      const quotedOut = direction === 'USDT_TO_SHIB'
-        ? await zirakSwapRead.quoteUSDTToSHIB(amountInWei)
-        : await zirakSwapRead.quoteSHIBToUSDT(amountInWei);
+      const path = [inAddr, outAddr];
+      const routerRead = new ethersLib.Contract(PANCAKE_ROUTER, ROUTER_ABI, ethersProvider);
+      const amounts = await routerRead.getAmountsOut(amountInWei, path);
+      const quotedOut = amounts[amounts.length - 1];
 
       // slippage tolerance apply karte hain (jaise 0.5% => 99.5% guaranteed minimum)
       const slippageBps = BigInt(Math.round(slippagePercent * 100)); // basis points
       const minOut = quotedOut - (quotedOut * slippageBps / 10000n);
 
       // 1) Allowance check karo, agar kam hai to approve karo
-      const allowance = await tokenIn.allowance(walletAddress, ZIRAKSWAP_ADDRESS);
+      const allowance = await tokenIn.allowance(walletAddress, PANCAKE_ROUTER);
       if(allowance < amountInWei){
         document.getElementById('swapBtnLabel').textContent = 'Approving ' + inSym + '...';
-        const approveTx = await tokenIn.approve(ZIRAKSWAP_ADDRESS, amountInWei);
+        const approveTx = await tokenIn.approve(PANCAKE_ROUTER, amountInWei);
         await approveTx.wait();
       }
 
-      // 2) Asli swap
+      // 2) Asli swap — PancakeSwap ke asli liquidity se, seedha user ke wallet me
       document.getElementById('swapBtnLabel').textContent = 'Swapping...';
-      const zirakSwapWrite = new ethersLib.Contract(ZIRAKSWAP_ADDRESS, ZIRAKSWAP_ABI, signer);
+      const routerWrite = new ethersLib.Contract(PANCAKE_ROUTER, ROUTER_ABI, signer);
       const deadline = Math.floor(Date.now() / 1000) + 60 * 20; // 20 minute deadline
 
-      const swapTx = direction === 'USDT_TO_SHIB'
-        ? await zirakSwapWrite.swapUSDTForSHIB(amountInWei, minOut, deadline)
-        : await zirakSwapWrite.swapSHIBForUSDT(amountInWei, minOut, deadline);
+      const swapTx = await routerWrite.swapExactTokensForTokens(amountInWei, minOut, path, walletAddress, deadline);
 
       document.getElementById('swapBtnLabel').textContent = 'Confirming...';
       await swapTx.wait();
