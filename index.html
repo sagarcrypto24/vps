@@ -783,8 +783,8 @@
     const iconEl = document.getElementById(side === 'from' ? 'fromTokenIcon' : 'toTokenIcon');
     const symEl = document.getElementById(side === 'from' ? 'fromTokenSymbol' : 'toTokenSymbol');
     iconEl.style.background = token.bg || 'var(--surface-2)';
-    iconEl.innerHTML = token.img ? '<img src="' + token.img + '" alt="' + token.symbol + '">' : (token.icon || '');
-    symEl.textContent = token.symbol;
+    iconEl.innerHTML = tokenDotHTML(token);
+    symEl.textContent = token.symbol; // textContent = safe by default, no HTML injection risk
   }
   renderTokenSelect('from');
   renderTokenSelect('to');
@@ -811,8 +811,26 @@
   const tokenSearch = document.getElementById('tokenSearch');
   const tokenList = document.getElementById('tokenList');
 
+  function escapeHtml(str){
+    return String(str == null ? '' : str)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  // Agar image load fail ho jaaye (logo maujood nahi), letter-badge fallback dikhate hain
+  window.__tokenIconFallback = function(imgEl, symbol){
+    var span = document.createElement('span');
+    span.style.cssText = "font-family:'JetBrains Mono',monospace;font-size:9px;color:#fff;font-weight:800;";
+    span.textContent = (symbol || '?').slice(0,4).toUpperCase();
+    imgEl.replaceWith(span);
+  };
+
   function tokenDotHTML(t){
-    if(t.img) return '<img src="' + t.img + '" alt="' + t.symbol + '">';
+    const safeSymbol = escapeHtml(t.symbol);
+    if(t.img){
+      return '<img src="' + t.img + '" alt="' + safeSymbol + '" style="width:100%;height:100%;object-fit:cover;" ' +
+        'onerror=\'window.__tokenIconFallback(this, "' + safeSymbol.replace(/"/g,'') + '")\'>';
+    }
     return t.icon || '';
   }
 
@@ -854,21 +872,28 @@
           ]);
           if(mySeq !== customTokenLookupSeq) return; // ek naya search shuru ho chuka hai, purana result ignore karo
 
+          // ⚠️ tName/tSymbol seedhe kisi bhi arbitrary contract se aate hain — HTML mein daalne se pehle
+          // hamesha escape karo, warna ek malicious token contract page mein code inject kar sakta hai
+          const checksummed = ethersLib.getAddress(q);
+          const logoUrl = 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/smartchain/assets/' + checksummed + '/logo.png';
+
           const customToken = { symbol: tSymbol, name: tName, address: q, custom: true,
-            icon: '<span style="font-family:JetBrains Mono;font-size:9px;color:white;font-weight:800">' + tSymbol.slice(0,4).toUpperCase() + '</span>',
-            bg: '#5B6472' };
+            img: logoUrl, bg: '#5B6472' };
 
           const selectedToken = pickerSide === 'from' ? fromToken : toToken;
           const otherToken = pickerSide === 'from' ? toToken : fromToken;
           const isDisabled = customToken.address.toLowerCase() === otherToken.address.toLowerCase();
+
+          const safeSymbol = escapeHtml(customToken.symbol);
+          const safeName = escapeHtml(customToken.name);
 
           const btn = document.createElement('button');
           btn.className = 'tm-item';
           btn.style.opacity = isDisabled ? '0.4' : '1';
           btn.style.cursor = isDisabled ? 'not-allowed' : 'pointer';
           btn.innerHTML =
-            '<span class="tm-dot" style="background:' + customToken.bg + '">' + customToken.icon + '</span>' +
-            '<span class="tm-info"><span class="tm-symbol">' + customToken.symbol + '</span><span class="tm-name">' + customToken.name + ' · Custom token, verify carefully</span></span>';
+            '<span class="tm-dot" style="background:' + customToken.bg + '">' + tokenDotHTML(customToken) + '</span>' +
+            '<span class="tm-info"><span class="tm-symbol">' + safeSymbol + '</span><span class="tm-name">' + safeName + ' · Custom token, verify carefully</span></span>';
           if(!isDisabled){
             btn.addEventListener('click', () => {
               if(pickerSide === 'from') fromToken = customToken; else toToken = customToken;
