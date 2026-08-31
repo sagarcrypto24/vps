@@ -838,12 +838,22 @@
 
   async function renderTokenList(filter){
     const q = (filter || '').trim().toLowerCase();
+    const otherToken = pickerSide === 'from' ? toToken : fromToken;
+    const otherIsUsdt = otherToken.symbol === 'USDT';
+
     // USDT hamesha sabse upar (priority) — baaki alphabetically
-    const sorted = [...TOKEN_LIST].sort((a,b) => {
+    let sorted = [...TOKEN_LIST].sort((a,b) => {
       if(a.pinned) return -1;
       if(b.pinned) return 1;
       return a.symbol.localeCompare(b.symbol);
     });
+
+    // ★ Zaroori niyam: agar doosri taraf USDT nahi hai, to is side par SIRF USDT hi chuna ja sakta hai —
+    // isse hamesha ek side USDT bani rehti hai, kabhi bhi "SHIB <-> WBNB" jaisa non-USDT pair nahi ban sakta
+    if(!otherIsUsdt){
+      sorted = sorted.filter(t => t.symbol === 'USDT');
+    }
+
     const filtered = sorted.filter(t =>
       !q || t.symbol.toLowerCase().includes(q) || t.name.toLowerCase().includes(q) || t.address.toLowerCase() === q
     );
@@ -853,8 +863,16 @@
 
     tokenList.innerHTML = '';
 
+    if(!otherIsUsdt && !q){
+      const noteEl = document.createElement('div');
+      noteEl.className = 'tm-item';
+      noteEl.style.opacity = '0.6'; noteEl.style.cursor = 'default';
+      noteEl.innerHTML = '<span class="tm-info"><span class="tm-name">Ek side hamesha USDT rehti hai — pehle isse USDT chunein</span></span>';
+      tokenList.appendChild(noteEl);
+    }
+
     // Agar user ne ek valid address paste ki hai jo list mein nahi hai, blockchain se uski info laate hain
-    if(isAddressQuery && !alreadyInList){
+    if(isAddressQuery && !alreadyInList && otherIsUsdt){
       const mySeq = ++customTokenLookupSeq;
       const loadingBtn = document.createElement('div');
       loadingBtn.className = 'tm-item';
