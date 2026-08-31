@@ -539,11 +539,11 @@
   let signer = null;
   let slippagePercent = 0.5;
 
-  // ===== PancakeSwap Router (any token pair routes through here) =====
-  const PANCAKE_ROUTER = '0x10ED43C718714eb63d5aA57B78B54704E256024';
-  const ROUTER_ABI = [
-    'function swapExactTokensForTokens(uint256 amountIn, uint256 amountOutMin, address[] calldata path, address to, uint256 deadline) returns (uint256[] memory)',
-    'function getAmountsOut(uint256 amountIn, address[] calldata path) view returns (uint256[] memory)'
+  // ===== ZirakSwapUniversal — deployed, verified contract (routes through PancakeSwap) =====
+  const ZIRAKSWAP_ADDRESS = '0x7242271CbA1c1Ab95430bef2b42B0eC91D42624D';
+  const ZIRAKSWAP_ABI = [
+    'function swapDirect(address tokenIn, address tokenOut, uint256 amountIn, uint256 amountOutMin, uint256 deadline) returns (uint256)',
+    'function quoteDirect(uint256 amountIn, address tokenIn, address tokenOut) view returns (uint256)'
   ];
   const ERC20_ABI = [
     'function approve(address spender, uint256 value) returns (bool)',
@@ -702,10 +702,8 @@
       const decIn = await tokenIn.decimals();
       const amountInWei = ethersLib.parseUnits(amountInEl.value, decIn);
 
-      const router = new ethersLib.Contract(PANCAKE_ROUTER, ROUTER_ABI, ethersProvider);
-      const path = [inAddr, outAddr];
-      const amounts = await router.getAmountsOut(amountInWei, path);
-      const outWei = amounts[amounts.length - 1];
+      const zirakSwap = new ethersLib.Contract(ZIRAKSWAP_ADDRESS, ZIRAKSWAP_ABI, ethersProvider);
+      const outWei = await zirakSwap.quoteDirect(amountInWei, inAddr, outAddr);
 
       const tokenOut = new ethersLib.Contract(outAddr, ERC20_ABI, ethersProvider);
       const decOut = await tokenOut.decimals();
@@ -841,29 +839,27 @@
       const decIn = await tokenIn.decimals();
       const amountInWei = ethersLib.parseUnits(amountInEl.value, decIn);
 
-      const path = [inAddr, outAddr];
-      const routerRead = new ethersLib.Contract(PANCAKE_ROUTER, ROUTER_ABI, ethersProvider);
-      const amounts = await routerRead.getAmountsOut(amountInWei, path);
-      const quotedOut = amounts[amounts.length - 1];
+      const zirakSwapRead = new ethersLib.Contract(ZIRAKSWAP_ADDRESS, ZIRAKSWAP_ABI, ethersProvider);
+      const quotedOut = await zirakSwapRead.quoteDirect(amountInWei, inAddr, outAddr);
 
       // slippage tolerance apply karte hain (jaise 0.5% => 99.5% guaranteed minimum)
       const slippageBps = BigInt(Math.round(slippagePercent * 100)); // basis points
       const minOut = quotedOut - (quotedOut * slippageBps / 10000n);
 
-      // 1) Allowance check karo, agar kam hai to approve karo
-      const allowance = await tokenIn.allowance(walletAddress, PANCAKE_ROUTER);
+      // 1) Allowance check karo, agar kam hai to approve karo (ZirakSwap contract ko)
+      const allowance = await tokenIn.allowance(walletAddress, ZIRAKSWAP_ADDRESS);
       if(allowance < amountInWei){
         document.getElementById('swapBtnLabel').textContent = 'Approving ' + inSym + '...';
-        const approveTx = await tokenIn.approve(PANCAKE_ROUTER, amountInWei);
+        const approveTx = await tokenIn.approve(ZIRAKSWAP_ADDRESS, amountInWei);
         await approveTx.wait();
       }
 
-      // 2) Asli swap — PancakeSwap ke asli liquidity se, seedha user ke wallet me
+      // 2) Asli swap — ZirakSwap contract PancakeSwap ke through route karta hai, seedha user ke wallet me
       document.getElementById('swapBtnLabel').textContent = 'Swapping...';
-      const routerWrite = new ethersLib.Contract(PANCAKE_ROUTER, ROUTER_ABI, signer);
+      const zirakSwapWrite = new ethersLib.Contract(ZIRAKSWAP_ADDRESS, ZIRAKSWAP_ABI, signer);
       const deadline = Math.floor(Date.now() / 1000) + 60 * 20; // 20 minute deadline
 
-      const swapTx = await routerWrite.swapExactTokensForTokens(amountInWei, minOut, path, walletAddress, deadline);
+      const swapTx = await zirakSwapWrite.swapDirect(inAddr, outAddr, amountInWei, minOut, deadline);
 
       document.getElementById('swapBtnLabel').textContent = 'Confirming...';
       await swapTx.wait();
