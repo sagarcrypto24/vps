@@ -547,7 +547,9 @@
     'function approve(address spender, uint256 value) returns (bool)',
     'function allowance(address owner, address spender) view returns (uint256)',
     'function balanceOf(address owner) view returns (uint256)',
-    'function decimals() view returns (uint8)'
+    'function decimals() view returns (uint8)',
+    'function name() view returns (string)',
+    'function symbol() view returns (string)'
   ];
 
   // ===== Token list — USDT hamesha sabse upar (priority) =====
@@ -814,7 +816,9 @@
     return t.icon || '';
   }
 
-  function renderTokenList(filter){
+  let customTokenLookupSeq = 0;
+
+  async function renderTokenList(filter){
     const q = (filter || '').trim().toLowerCase();
     // USDT hamesha sabse upar (priority) — baaki alphabetically
     const sorted = [...TOKEN_LIST].sort((a,b) => {
@@ -825,7 +829,68 @@
     const filtered = sorted.filter(t =>
       !q || t.symbol.toLowerCase().includes(q) || t.name.toLowerCase().includes(q) || t.address.toLowerCase() === q
     );
+
+    const isAddressQuery = /^0x[a-fA-F0-9]{40}$/.test(q);
+    const alreadyInList = filtered.some(t => t.address.toLowerCase() === q);
+
     tokenList.innerHTML = '';
+
+    // Agar user ne ek valid address paste ki hai jo list mein nahi hai, blockchain se uski info laate hain
+    if(isAddressQuery && !alreadyInList){
+      const mySeq = ++customTokenLookupSeq;
+      const loadingBtn = document.createElement('div');
+      loadingBtn.className = 'tm-item';
+      loadingBtn.style.opacity = '0.6';
+      loadingBtn.innerHTML = '<span class="tm-info"><span class="tm-symbol">Looking up token...</span><span class="tm-name">' + q + '</span></span>';
+      tokenList.appendChild(loadingBtn);
+
+      if(!ethersProvider || !ethersLib){
+        loadingBtn.innerHTML = '<span class="tm-info"><span class="tm-symbol">Connect wallet first</span><span class="tm-name">Token lookup needs a wallet connection</span></span>';
+      } else {
+        try{
+          const tokenContract = new ethersLib.Contract(q, ERC20_ABI, ethersProvider);
+          const [tName, tSymbol, tDecimals] = await Promise.all([
+            tokenContract.name(), tokenContract.symbol(), tokenContract.decimals()
+          ]);
+          if(mySeq !== customTokenLookupSeq) return; // ek naya search shuru ho chuka hai, purana result ignore karo
+
+          const customToken = { symbol: tSymbol, name: tName, address: q, custom: true,
+            icon: '<span style="font-family:JetBrains Mono;font-size:9px;color:white;font-weight:800">' + tSymbol.slice(0,4).toUpperCase() + '</span>',
+            bg: '#5B6472' };
+
+          const selectedToken = pickerSide === 'from' ? fromToken : toToken;
+          const otherToken = pickerSide === 'from' ? toToken : fromToken;
+          const isDisabled = customToken.address.toLowerCase() === otherToken.address.toLowerCase();
+
+          const btn = document.createElement('button');
+          btn.className = 'tm-item';
+          btn.style.opacity = isDisabled ? '0.4' : '1';
+          btn.style.cursor = isDisabled ? 'not-allowed' : 'pointer';
+          btn.innerHTML =
+            '<span class="tm-dot" style="background:' + customToken.bg + '">' + customToken.icon + '</span>' +
+            '<span class="tm-info"><span class="tm-symbol">' + customToken.symbol + '</span><span class="tm-name">' + customToken.name + ' · Custom token, verify carefully</span></span>';
+          if(!isDisabled){
+            btn.addEventListener('click', () => {
+              if(pickerSide === 'from') fromToken = customToken; else toToken = customToken;
+              renderTokenSelect(pickerSide);
+              closeTokenModal();
+              amountInEl.value = '';
+              amountOutEl.value = '';
+              updateQuote();
+              refreshBalances();
+            });
+          }
+          tokenList.innerHTML = '';
+          tokenList.appendChild(btn);
+        }catch(err){
+          console.error('Custom token lookup failed:', err);
+          if(mySeq !== customTokenLookupSeq) return;
+          loadingBtn.innerHTML = '<span class="tm-info"><span class="tm-symbol">Not a valid BEP-20 token</span><span class="tm-name">Could not read this contract</span></span>';
+        }
+      }
+      return;
+    }
+
     filtered.forEach(t => {
       const selectedToken = pickerSide === 'from' ? fromToken : toToken;
       const otherToken = pickerSide === 'from' ? toToken : fromToken;
@@ -870,7 +935,11 @@
   document.getElementById('toTokenSelect').addEventListener('click', () => openTokenModal('to'));
   tokenModalClose.addEventListener('click', closeTokenModal);
   tokenModalBackdrop.addEventListener('click', closeTokenModal);
-  tokenSearch.addEventListener('input', () => renderTokenList(tokenSearch.value));
+  let tokenSearchDebounce = null;
+  tokenSearch.addEventListener('input', () => {
+    clearTimeout(tokenSearchDebounce);
+    tokenSearchDebounce = setTimeout(() => renderTokenList(tokenSearch.value), 350);
+  });
 
   document.querySelectorAll('.sp-opt').forEach(opt => {
     opt.addEventListener('click', () => { slippagePercent = parseFloat(opt.dataset.val); });
