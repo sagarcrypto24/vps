@@ -780,11 +780,18 @@
 
   function renderTokenSelect(side){
     const token = side === 'from' ? fromToken : toToken;
+    const selectEl = document.getElementById(side === 'from' ? 'fromTokenSelect' : 'toTokenSelect');
     const iconEl = document.getElementById(side === 'from' ? 'fromTokenIcon' : 'toTokenIcon');
     const symEl = document.getElementById(side === 'from' ? 'fromTokenSymbol' : 'toTokenSymbol');
     iconEl.style.background = token.bg || 'var(--surface-2)';
     iconEl.innerHTML = tokenDotHTML(token);
     symEl.textContent = token.symbol; // textContent = safe by default, no HTML injection risk
+
+    const chevron = selectEl.querySelector('.chev');
+    const isLocked = token.symbol === 'USDT';
+    if(chevron) chevron.style.display = isLocked ? 'none' : '';
+    selectEl.style.cursor = isLocked ? 'default' : 'pointer';
+    selectEl.style.opacity = isLocked ? '1' : '1';
   }
   renderTokenSelect('from');
   renderTokenSelect('to');
@@ -974,8 +981,14 @@
     tokenModalBackdrop.classList.remove('show');
   }
 
-  document.getElementById('fromTokenSelect').addEventListener('click', () => openTokenModal('from'));
-  document.getElementById('toTokenSelect').addEventListener('click', () => openTokenModal('to'));
+  document.getElementById('fromTokenSelect').addEventListener('click', () => {
+    if(fromToken.symbol === 'USDT') return; // USDT wali side fixed hai — click par kuch na ho
+    openTokenModal('from');
+  });
+  document.getElementById('toTokenSelect').addEventListener('click', () => {
+    if(toToken.symbol === 'USDT') return; // USDT wali side fixed hai — click par kuch na ho
+    openTokenModal('to');
+  });
   tokenModalClose.addEventListener('click', closeTokenModal);
   tokenModalBackdrop.addEventListener('click', closeTokenModal);
   let tokenSearchDebounce = null;
