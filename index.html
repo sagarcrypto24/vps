@@ -4,6 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>realswap — Swap</title>
+
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="apple-touch-icon" href="assets/logo.png">
+
+<!-- Link share preview (Open Graph — WhatsApp, Telegram, Facebook, etc.) -->
+<meta property="og:title" content="realswap — Decentralized Swap">
+<meta property="og:description" content="Swap USDT and other BEP-20 tokens directly, powered by real on-chain liquidity.">
+<meta property="og:image" content="https://realswap.business/assets/logo.png">
+<meta property="og:url" content="https://realswap.business">
+<meta property="og:type" content="website">
+
+<!-- Link share preview (Twitter/X Card) -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="realswap — Decentralized Swap">
+<meta name="twitter:description" content="Swap USDT and other BEP-20 tokens directly, powered by real on-chain liquidity.">
+<meta name="twitter:image" content="https://realswap.business/assets/logo.png">
+
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
@@ -78,7 +96,7 @@
   nav{ position:sticky; top:0; z-index:100; background:rgba(11,14,20,0.7); backdrop-filter:blur(14px); border-bottom:1px solid var(--line); }
   .nav-inner{ max-width:520px; margin:0 auto; padding:10px 18px; display:flex; align-items:center; justify-content:space-between; }
   .brand{ display:flex; align-items:center; gap:9px; font-family:'Space Grotesk'; font-weight:700; font-size:18px; }
-  .brand .mark{ width:24px; height:24px; border-radius:7px; background:linear-gradient(135deg, var(--teal), var(--violet)); flex-shrink:0; box-shadow:0 0 16px -2px rgba(45,212,191,0.6); }
+  .brand .mark{ width:24px; height:24px; border-radius:50%; flex-shrink:0; box-shadow:0 0 16px -2px rgba(45,212,191,0.6); object-fit:cover; }
   appkit-button{ --w3m-font-family:'Inter', sans-serif; }
 
   /* ---------- MAIN (swap at top, single page) ---------- */
@@ -346,7 +364,7 @@
 
 <nav>
   <div class="nav-inner">
-    <div class="brand"><span class="mark"></span>realswap</div>
+    <div class="brand"><img class="mark" src="assets/logo.png" alt="realswap">realswap</div>
     <appkit-button balance="hide" label="Connect Wallet"></appkit-button>
   </div>
 </nav>
@@ -660,7 +678,7 @@
           name: 'realswap',
           description: 'realswap Decentralized Exchange',
           url: 'https://realswap.business',
-          icons: ['https://avatars.githubusercontent.com/u/179229932']
+          icons: ['https://realswap.business/assets/logo.png']
         },
         themeMode: 'dark',
         themeVariables: { '--w3m-accent': '#2DD4BF', '--w3m-border-radius-master': '2px' },
